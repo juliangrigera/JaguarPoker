@@ -20,10 +20,10 @@ PokerMainTask class >> canBeRoot [
 { #category : #testing }
 PokerMainTask class >> initialize [
 	(WAAdmin register: self asApplicationAt: #poker)
-		addLibrary: TBSDeploymentLibrary;
-		addLibrary: PokerFileLibrary;
 		addLibrary: JQDeploymentLibrary;
 		addLibrary: JQUiDeploymentLibrary;
+		addLibrary: TBSDeploymentLibrary;
+		addLibrary: PokerFileLibrary;
 		sessionClass: PokerSession
 ]
 

@@ -168,42 +168,42 @@ PokerHandView >> renderControlButton: aString callback: aBlock condition: aBoole
 
 { #category : #rendering }
 PokerHandView >> renderControlsOn: html [
-	self isDealer
-		ifTrue: [ html div
-				script:
-					(html jQuery this load
-						html: [ :r | self renderControlsPanelOn: r ];
-						interval: 2 seconds);
-				with: [ self renderControlsPanelOn: html ] ]
+	html div
+		script:
+			(html jQuery this load
+				html: [ :r | self renderControlsPanelOn: r ];
+				interval: 2 seconds);
+		with: [ self renderControlsPanelOn: html ]
 ]
 
 { #category : #rendering }
 PokerHandView >> renderControlsPanelOn: html [
-	self
-		renderControlButton: 'Repartir'
-			callback: [ self hand deal ]
-			condition: self hand canDeal
-			on: html;
-		renderControlButton: 'Habilitar Cambio de Cartas'
-			callback: [ self hand enableCardsChange ]
-			condition: self hand canChangeCards
-			on: html;
-		renderControlButton: 'Habilitar Apuesta Final'
-			callback: [ self hand acceptBets ]
-			condition: self hand canAcceptBets
-			on: html;
-		renderControlButton: 'Habilitar Mostrar Cartas'
-			callback: [ self hand enableCardsShowing ]
-			condition: self hand canShowCards
-			on: html;
-		renderControlButton: 'Otorgar Pozo'
-			callback: [ self call: (GivePotView hand: self hand) ]
-			condition: self hand canSharePot
-			on: html.
-	^ html anchor
-		class: 'btn btn-success btn-lg';
-		callback: [ self newHand ];
-		with: 'Nueva Mano'
+	self isDealer
+		ifTrue: [ self
+				renderControlButton: 'Repartir'
+					callback: [ self hand deal ]
+					condition: self hand canDeal
+					on: html;
+				renderControlButton: 'Habilitar Cambio de Cartas'
+					callback: [ self hand enableCardsChange ]
+					condition: self hand canChangeCards
+					on: html;
+				renderControlButton: 'Habilitar Apuesta Final'
+					callback: [ self hand acceptBets ]
+					condition: self hand canAcceptBets
+					on: html;
+				renderControlButton: 'Habilitar Mostrar Cartas'
+					callback: [ self hand enableCardsShowing ]
+					condition: self hand canShowCards
+					on: html;
+				renderControlButton: 'Otorgar Pozo'
+					callback: [ self call: (GivePotView hand: self hand) ]
+					condition: self hand canSharePot
+					on: html.
+			html anchor
+				class: 'btn btn-success btn-lg';
+				callback: [ self newHand ];
+				with: 'Nueva Mano' ]
 ]
 
 { #category : #rendering }
@@ -274,11 +274,13 @@ PokerHandView >> renderOtherPlayer: player panelOn: html [
 	html heading level4
 		with: [ html text: player name.
 			self renderIndicatorsFor: player on: html ].
-	player cards
-		do: [ :card | 
-			(player canShow: card)
-				ifTrue: [ self renderCard: card on: html ]
-				ifFalse: [ self renderCoveredCard: card on: html ] ].
+	html div
+		class: #folded if: (self hand hasFolded: player);
+		with: [ player cards
+				do: [ :card | 
+					(player canShow: card)
+						ifTrue: [ self renderCard: card on: html ]
+						ifFalse: [ self renderCoveredCard: card on: html ] ] ].
 	html paragraph: player chips printString , ' fichas'
 ]
 
@@ -301,7 +303,9 @@ PokerHandView >> renderOwnPlayer: player panelOn: html [
 	html heading level4
 		with: [ html text: player name.
 			self renderIndicatorsFor: player on: html ].
-	player cards do: [ :card | self renderCard: card on: html ].
+	html div
+		class: #folded if: (self hand hasFolded: player);
+		with: [ player cards do: [ :card | self renderCard: card on: html ] ].
 	html paragraph: player chips printString , ' fichas'.
 	html paragraph: [ self renderPlayer: player controlsOn: html ]
 ]
@@ -318,7 +322,6 @@ PokerHandView >> renderPassButtonOn: html [
 PokerHandView >> renderPlayer: aPlayer controlsOn: html [
 	(self hand hasFolded: aPlayer)
 		ifFalse: [ self hand accept: self with: html ]
-		ifTrue: [ html text: 'Te fuiste' ]
 ]
 
 { #category : #'rendering - player' }
@@ -411,6 +414,7 @@ PokerHandView >> selectedCards: someCards [
 { #category : #controlling }
 PokerHandView >> showCards [
 	self currentPlayer showCards: self selectedCards.
+	self selectedCards: OrderedCollection new.
 	self hand rotateSpeaker
 ]
 

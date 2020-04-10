@@ -85,6 +85,11 @@ PokerHandState >> placeAnteFor: aPlayer [
 ]
 
 { #category : #'game - bets' }
+PokerHandState >> placeAnteOf: chipsCount for: aPlayer [
+	self error: 'No se puede poner luz ahora'
+]
+
+{ #category : #'game - bets' }
 PokerHandState >> placeFirstBet: anInteger for: aPlayer [
 	self error: 'Cannot first bet right now'
 ]

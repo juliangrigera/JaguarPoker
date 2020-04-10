@@ -556,6 +556,7 @@ PokerFileLibrary >> styleCssContent [
 		margin: 10px;
 		border: 2px dotted #efe;
 		}
+	.folded{opacity: .5}
 	//.bettingOptions .col-md-4 { margin-left: 12px }
 	.bettingOptions .col-md-4, 	.bettingOptions .col-md-3  { padding: 2px }
 	.bettingOptions.handControl .col-md-4 { margin: 10px 0 0 0 }
@@ -565,6 +566,7 @@ PokerFileLibrary >> styleCssContent [
 		}
 	.card-label {
 		cursor: pointer;
+		position: relative;
 		}
 	.card-label img{
 		border: 1px solid #ddd;
@@ -577,8 +579,8 @@ PokerFileLibrary >> styleCssContent [
         display: block;
         border-radius: 50%;
         border: 1px solid grey;
-        position: relative;
-        top: 15px;
+        position: absolute;
+        top: -5px;
         left: -5px;
         width: 25px;
         height: 25px;
@@ -595,8 +597,8 @@ PokerFileLibrary >> styleCssContent [
         content: "✓";
         background-color: grey;
         transform: scale(1);
-        position: relative;
-        top: 15px;
+        position: absolute;
+        top: -5px;
 		  z-index: 9999;
         }
     :checked+input+.card-label img {

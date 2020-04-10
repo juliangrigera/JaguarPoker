@@ -15,5 +15,8 @@ Ante >> isAnte [
 { #category : #printing }
 Ante >> printOn: aStream [
 	aStream << 'Luz de '.
-	aStream << self player name
+	aStream << self player name.
+	aStream << ' ('.
+	self chipsCount printOn: aStream.
+	aStream << ')'.
 ]

@@ -102,12 +102,26 @@ PokerGame >> initialize [
 	players := OrderedCollection new
 ]
 
+{ #category : #private }
+PokerGame >> mustKeepAntes [
+	^ self currentPokerHand isNotNil
+		and: [ self currentPokerHand allAntesPlaced
+				& self currentPokerHand firstBets isEmpty ]
+]
+
 { #category : #game }
 PokerGame >> newHand [
+	| newHand |
 	self
 		resetPlayers;
-		rotateDealer;
-		currentHand: (PokerHand players: self players dealer: self dealer)
+		rotateDealer.
+	newHand := self mustKeepAntes
+		ifTrue: [ PokerExtraHand
+				players: self players
+				dealer: self dealer
+				pot: self currentPokerHand pot ]
+		ifFalse: [ PokerHand players: self players dealer: self dealer ].
+	self currentHand: newHand
 ]
 
 { #category : #accessing }

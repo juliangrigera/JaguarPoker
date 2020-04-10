@@ -1,3 +1,6 @@
+"
+Simple view for sharing the pot
+"
 Class {
 	#name : #GivePotView,
 	#superclass : #WAComponent,
@@ -22,9 +25,10 @@ GivePotView >> givePot [
 	self shares
 		keysAndValuesDo: [ :player :share | 
 			| integerShare |
-			integerShare := (self hand potSize * share asNumber / 100) floor.
-			player getChips: integerShare.
-			pot := pot - integerShare ].
+			share
+				ifNotNil: [ integerShare := (self hand potSize * share asNumber / 100) floor.
+					player getChips: integerShare.
+					pot := pot - integerShare ] ].
 	self hand dealer getChips: pot.
 	self answer
 ]
@@ -66,7 +70,9 @@ GivePotView >> renderPlayer: player percentageInputOn: html [
 			html textInput
 				tbsFormControl;
 				id: player name asValidSelector;
-				callback: [ :share | share ifNotNil: [ self shares at: player put: share ] ];
+				callback: [ :share | 
+					share ~= '' & share isNotNil
+						ifTrue: [ self shares at: player put: share ] ];
 				placeholder: '% del pozo' ]
 ]
 

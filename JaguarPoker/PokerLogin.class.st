@@ -56,7 +56,6 @@ PokerLogin >> renderLoginFormOn: html [
 		tbsForm: [ html
 				tbsFormGroup: [ html label
 						for: 'playerName';
-						class: 'sr-only';
 						with: 'Nombre del Jugador'.
 					html textInput
 						tbsFormControl;
@@ -67,9 +66,8 @@ PokerLogin >> renderLoginFormOn: html [
 			html
 				tbsFormGroup: [ html label
 						for: 'gameCode';
-						class: 'sr-only';
 						with: 'Código de Juego'.
-					html passwordInput tbsFormControl
+					html textInput tbsFormControl
 						id: 'gameCode';
 						on: #gameCode of: self;
 						placeholder: 'Código de juego'.

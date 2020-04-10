@@ -207,10 +207,13 @@ PokerHand >> doDeal [
 
 { #category : #private }
 PokerHand >> doRotateSpeaker [
-	| nextSpeaker |
-	nextSpeaker := self activePlayers
-		after: self speaker
-		ifAbsent: [ self activePlayers first ].
+	| nextSpeaker currentFolded |
+	currentFolded := (self activePlayers includes: self speaker) not.
+	nextSpeaker := currentFolded
+		ifTrue: [ self firstActiveAfter: self speaker ]
+		ifFalse: [ self activePlayers
+				after: self speaker
+				ifAbsent: [ self activePlayers first ] ].
 	self speaker: nextSpeaker
 ]
 
@@ -227,6 +230,19 @@ PokerHand >> enableCardsChange [
 { #category : #game }
 PokerHand >> enableCardsShowing [
 	self state enableCardsShowing
+]
+
+{ #category : #private }
+PokerHand >> firstActiveAfter: aPlayer [
+	| index |
+	index := self players indexOf: aPlayer.
+	(0 to: self players size - 2)
+		collect: [ :ix | 
+			| candidateIndex candidate |
+			candidateIndex := 1 + ((ix + index) % self players size).
+			candidate := self players at: candidateIndex.
+			(self activePlayers includes: candidate)
+				ifTrue: [ ^ candidate ] ]
 ]
 
 { #category : #'game - bets' }
@@ -249,14 +265,16 @@ PokerHand >> firstBetsAreEven [
 PokerHand >> firstBetsRoundDone [
 	^ self firstBetsAreEven
 		&
-			(self activePlayers
-				allSatisfy: [ :player | self placedFirstBet: player ])
+			((self activePlayers allSatisfy: #passed)
+				|
+					(self activePlayers
+						allSatisfy: [ :player | self placedFirstBet: player ]))
 ]
 
 { #category : #game }
 PokerHand >> foldPlayer: aPlayer [
-	self rotateSpeaker.
-	self activePlayers remove: aPlayer
+	self activePlayers remove: aPlayer.
+	self rotateSpeaker
 ]
 
 { #category : #testing }
@@ -291,12 +309,13 @@ PokerHand >> leader [
 
 { #category : #game }
 PokerHand >> passPlayer: aPlayer [
+	aPlayer pass.
 	self rotateSpeaker
 ]
 
 { #category : #'game - bets' }
 PokerHand >> placeAnteFor: aPlayer [
-	self state placeAnteFor: aPlayer
+	self state placeAnteOf: 1 for: aPlayer
 ]
 
 { #category : #'game - bets' }
@@ -352,7 +371,9 @@ PokerHand >> potSize [
 
 { #category : #private }
 PokerHand >> resetSpeaker [
-	self speaker: self leader
+	self
+		speaker: self dealer;
+		rotateSpeaker
 ]
 
 { #category : #private }
@@ -378,10 +399,12 @@ PokerHand >> secondBetsAreEven [
 
 { #category : #testing }
 PokerHand >> secondBetsRoundDone [
-	^ self secondBetsAreEven 
+	^ self secondBetsAreEven
 		&
-			(self activePlayers
-				allSatisfy: [ :player | self placedSecondBet: player ])
+			((self activePlayers allSatisfy: #passed)
+				|
+					(self activePlayers
+						allSatisfy: [ :player | self placedSecondBet: player ]))
 ]
 
 { #category : #game }

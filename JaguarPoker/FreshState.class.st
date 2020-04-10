@@ -35,3 +35,8 @@ FreshState >> deal [
 FreshState >> placeAnteFor: aPlayer [
 	hand addBet: (aPlayer getAnte)
 ]
+
+{ #category : #'game - bids' }
+FreshState >> placeAnteOf: chipsCount for: aPlayer [
+	hand addBet: (aPlayer getAnteOf: chipsCount)
+]

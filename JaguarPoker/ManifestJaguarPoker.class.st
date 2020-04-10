@@ -1,5 +1,5 @@
 "
-I store metadata for this package. These meta data are used by other tools such as the SmalllintManifestChecker and the critics Browser
+Simple online 5-Card Poker game
 "
 Class {
 	#name : #ManifestJaguarPoker,

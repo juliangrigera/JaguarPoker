@@ -10,6 +10,7 @@ Class {
 		'name',
 		'chips',
 		'cards',
+		'passed',
 		'visibleCards',
 		'changedCards'
 	],
@@ -75,6 +76,12 @@ Player >> getAnte [
 	^ Ante of: 1 for: self
 ]
 
+{ #category : #'game - bets' }
+Player >> getAnteOf: chipsCount [
+	self chips: self chips - chipsCount.
+	^ Ante of: chipsCount for: self
+]
+
 { #category : #accessing }
 Player >> getChips: anInteger [
 	self chips: self chips + anInteger
@@ -97,6 +104,7 @@ Player >> initialize [
 	chips := 100.
 	cards := OrderedCollection new.
 	changedCards := false.
+	passed := false.
 	visibleCards := OrderedCollection new
 ]
 
@@ -108,6 +116,21 @@ Player >> name [
 { #category : #accessing }
 Player >> name: anObject [
 	name := anObject
+]
+
+{ #category : #accessing }
+Player >> pass [
+	passed := true
+]
+
+{ #category : #accessing }
+Player >> passed [
+	^ passed
+]
+
+{ #category : #accessing }
+Player >> passed: aBoolean [
+	passed := aBoolean
 ]
 
 { #category : #printing }
@@ -123,7 +146,8 @@ Player >> printOn: aStream [
 Player >> returnCards [
 	self cards: OrderedCollection new.
 	self visibleCards: OrderedCollection new.
-	changedCards := false
+	changedCards := false.
+	passed := false
 ]
 
 { #category : #accessing }

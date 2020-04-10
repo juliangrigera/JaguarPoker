@@ -35,7 +35,7 @@ PokerWaitingRoomView >> game: anObject [
 { #category : #rendering }
 PokerWaitingRoomView >> renderContentOn: html [
 	html
-		tbsContainer: [ html heading: 'Poker für Alles'.
+		tbsContainer: [ html heading: 'JaguarPoker'.
 			html heading level3 with: 'Esperando juntar 4'.
 			html heading level4 with: 'Hasta ahora tenemos a:'.
 			self game players
@@ -43,7 +43,7 @@ PokerWaitingRoomView >> renderContentOn: html [
 					html
 						paragraph: [ html text: player name.
 							player = self session player
-								ifTrue: [ html text: ' << este sos vos.' ] ] ].
+								ifTrue: [ html text: ' *' ] ] ].
 			html anchor
 				class: 'btn btn-large btn-success';
 				callback: [ self attemptToStart ];

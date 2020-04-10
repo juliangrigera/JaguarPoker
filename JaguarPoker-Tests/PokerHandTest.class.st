@@ -104,3 +104,145 @@ PokerHandTest >> testEnableCardsChange [
 	hand placeFirstBet: 2 for: panda.
 	self shouldnt: [ hand enableCardsChange ] raise: Error.
 ]
+
+{ #category : #test }
+PokerHandTest >> testFirstBetsRoundDone [
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	smallHand deal.
+	self deny: smallHand firstBetsRoundDone.
+]
+
+{ #category : #test }
+PokerHandTest >> testRotateSpeaker [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	self assert: smallHand speaker equals: nil.
+	smallHand deal.
+	self assert: smallHand speaker equals: nacho.
+	smallHand passPlayer: nacho.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		placeFirstBet: 3 for: wainer;
+		placeFirstBet: 3 for: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeFirstBet: 3 for: fede.
+	self assert: smallHand speaker equals: nacho.
+	smallHand foldPlayer: nacho.
+	self assert: smallHand speaker equals: nil.
+	smallHand enableCardsChange.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		change: {} to: wainer;
+		change: {} to: mono;
+		change: {} to: fede.
+	smallHand acceptBets.
+	smallHand
+		placeSecondBet: 10 for: wainer;
+		placeSecondBet: 10 for: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeSecondBet: 10 for: fede.
+	self assert: smallHand speaker equals: nil.
+]
+
+{ #category : #test }
+PokerHandTest >> testRotateSpeaker2 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	self assert: smallHand speaker equals: nil.
+	smallHand deal.
+	self assert: smallHand speaker equals: nacho.
+	smallHand passPlayer: nacho.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		placeFirstBet: 3 for: wainer;
+		placeFirstBet: 3 for: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeFirstBet: 3 for: fede.
+	self assert: smallHand speaker equals: nacho.
+	smallHand foldPlayer: nacho.
+	self assert: smallHand speaker equals: nil.
+	smallHand enableCardsChange.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		change: {} to: wainer;
+		change: {} to: mono;
+		change: {} to: fede.
+	smallHand acceptBets.
+	smallHand
+		passPlayer: wainer;
+		passPlayer: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeSecondBet: 10 for: fede.
+	self assert: smallHand speaker equals: wainer.
+]
+
+{ #category : #test }
+PokerHandTest >> testRotateSpeaker3 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	self assert: smallHand speaker equals: nil.
+	smallHand deal.
+	self assert: smallHand speaker equals: nacho.
+	smallHand passPlayer: nacho.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		placeFirstBet: 3 for: wainer;
+		placeFirstBet: 3 for: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeFirstBet: 3 for: fede.
+	self assert: smallHand speaker equals: nacho.
+	smallHand foldPlayer: nacho.
+	self assert: smallHand speaker equals: nil.
+	smallHand enableCardsChange.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		change: {} to: wainer;
+		change: {} to: mono;
+		change: {} to: fede.
+	smallHand acceptBets.
+	smallHand
+		passPlayer: wainer;
+		passPlayer: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand passPlayer: fede.
+	self assert: smallHand speaker equals: nil.
+]
+
+{ #category : #test }
+PokerHandTest >> testRotateSpeaker4 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	self assert: smallHand speaker equals: nil.
+	smallHand deal.
+	self assert: smallHand speaker equals: nacho.
+	smallHand passPlayer: nacho.
+	self assert: smallHand speaker equals: wainer.
+	smallHand
+		placeFirstBet: 3 for: wainer;
+		placeFirstBet: 3 for: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeFirstBet: 3 for: fede.
+	self assert: smallHand speaker equals: nacho.
+	smallHand placeFirstBet: 3 for: nacho.
+	self assert: smallHand speaker equals: nil.
+	smallHand enableCardsChange.
+	self assert: smallHand speaker equals: nacho.
+	smallHand
+		change: (nacho cards first: 3) to: nacho;
+		change: (wainer cards first: 2) to: wainer;
+		change: {} to: mono;
+		change: {} to: fede.
+	smallHand acceptBets.
+	smallHand
+		passPlayer: wainer;
+		placeSecondBet: 20 for: mono.
+	self assert: smallHand speaker equals: fede.
+	smallHand placeSecondBet: 20 for: fede.
+	self assert: smallHand speaker equals: nacho.
+	smallHand foldPlayer: nacho.
+	self assert: smallHand speaker equals: wainer.
+]
