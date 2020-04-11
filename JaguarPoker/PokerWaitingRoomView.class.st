@@ -38,14 +38,24 @@ PokerWaitingRoomView >> renderContentOn: html [
 		tbsContainer: [ html heading: 'JaguarPoker'.
 			html heading level3 with: 'Esperando juntar 4'.
 			html heading level4 with: 'Hasta ahora tenemos a:'.
-			self game players
-				do: [ :player | 
-					html
-						paragraph: [ html text: player name.
-							player = self session player
-								ifTrue: [ html text: ' *' ] ] ].
+			html div
+				script:
+					(html jQuery this load
+						html: [ :r | self renderPlayersOn: r ];
+						interval: 3 seconds);
+				with: [ self renderPlayersOn: html ].
 			html anchor
 				class: 'btn btn-large btn-success';
 				callback: [ self attemptToStart ];
 				with: 'Empezar' ]
+]
+
+{ #category : #rendering }
+PokerWaitingRoomView >> renderPlayersOn: html [
+	self game players
+		do: [ :player | 
+			html
+				paragraph: [ html text: player name.
+					player = self session player
+						ifTrue: [ html text: ' *' ] ] ]
 ]

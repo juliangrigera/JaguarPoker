@@ -29,7 +29,8 @@ PokerExtraHand >> antePlacedFor: aPlayer [
 
 { #category : #initialization }
 PokerExtraHand >> initializePot: someBets [
-	self requiredAnte: someBets last chipsCount * 2.
+	self
+		requiredAnte: (self maximumAnte min: someBets last chipsCount * 2).
 	self pot: someBets
 ]
 

@@ -50,9 +50,24 @@ GivePotView >> initialize [
 ]
 
 { #category : #rendering }
+GivePotView >> renderCard: card on: html [
+	html image
+		class: #card;
+		style: 'width:70px';
+		title: card cssClassName;
+		url: PokerFileLibrary / (card cssClassName , 'Png')
+]
+
+{ #category : #rendering }
 GivePotView >> renderContentOn: html [
 	html
-		tbsContainer: [ html
+		tbsContainer: [ html heading: 'Repartir Pozo'.
+			html heading level3
+				with: [ html
+						text: self hand potSize;
+						space;
+						text: #fichas ].
+			html
 				tbsForm: [ self hand activePlayers
 						do: [ :player | self renderPlayer: player percentageInputOn: html ].
 					html tbsSubmitButton
@@ -73,7 +88,10 @@ GivePotView >> renderPlayer: player percentageInputOn: html [
 				callback: [ :share | 
 					share ~= '' & share isNotNil
 						ifTrue: [ self shares at: player put: share ] ];
-				placeholder: '% del pozo' ]
+				placeholder: '% del pozo' ].
+	html
+		paragraph:
+			[ player visibleCards do: [ :card | self renderCard: card on: html ] ]
 ]
 
 { #category : #accessing }

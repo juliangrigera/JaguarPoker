@@ -199,6 +199,10 @@ PokerHandView >> renderControlsPanelOn: html [
 				renderControlButton: 'Otorgar Pozo'
 					callback: [ self call: (GivePotView hand: self hand) ]
 					condition: self hand canSharePot
+					on: html;
+				renderControlButton: 'Administrar Fichas'
+					callback: [ self call: (ManageChipsView hand: self hand) ]
+					condition: true
 					on: html.
 			html anchor
 				class: 'btn btn-success btn-lg';
