@@ -26,29 +26,38 @@ DealtState >> canChangeCards [
 { #category : #game }
 DealtState >> enableCardsChange [
 	self hand canChangeCards
-		ifTrue: [ self hand
-				state: (ChangeCardsState hand: self hand);
-				resetSpeaker ]
+		ifTrue: [ self hand activePlayers size > 1
+				ifTrue: [ self hand
+						state: (ChangeCardsState hand: self hand);
+						resetSpeaker ]
+				ifFalse: [ self hand state: (ShowCardsState hand: self hand) ] ]
 		ifFalse: [ super enableCardsChange ]
 ]
 
 { #category : #visitor }
 DealtState >> placeFirstBet: anInteger for: aPlayer [
-	| chipsToCall |
+	| chipsToCall allIn maxBet|
+	allIn := anInteger >= aPlayer chipsCount.
+	maxBet := anInteger min: aPlayer chipsCount.
 	chipsToCall := hand chipsToCallFirstBetFor: aPlayer.
-	hand addBet: (aPlayer getFirstBetOf: anInteger).
+	hand addBet: (aPlayer getFirstBetOf: maxBet).
 	anInteger > chipsToCall
 		ifTrue: [ hand lastRaiser: aPlayer ].
+	allIn ifTrue: [ hand markAsAllIn: aPlayer].
 	hand rotateSpeaker
 ]
 
 { #category : #visitor }
 DealtState >> raiseFirstBet: anInteger for: aPlayer [
-	| chipsToCall |
+	| chipsToCall bet allIn |
 	chipsToCall := hand chipsToCallFirstBetFor: aPlayer.
-	hand addBet: (aPlayer getFirstBetOf: chipsToCall + anInteger).
+	bet := chipsToCall + anInteger.
+	allIn := bet >= aPlayer chipsCount.
+	hand addBet: (aPlayer getFirstBetOf: bet).
 	anInteger > 0
 		ifTrue: [ hand lastRaiser: aPlayer ].
+	allIn
+		ifTrue: [ hand markAsAllIn: aPlayer ].
 	hand rotateSpeaker
 ]
 

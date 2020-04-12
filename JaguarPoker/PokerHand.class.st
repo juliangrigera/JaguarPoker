@@ -14,7 +14,8 @@ Class {
 		'discarded',
 		'pot',
 		'state',
-		'lastRaiser'
+		'lastRaiser',
+		'allInPlayers'
 	],
 	#category : #'JaguarPoker-Model'
 }
@@ -78,6 +79,11 @@ PokerHand >> allAntesPlaced [
 		allSatisfy: [ :player | self pot anySatisfy: [ :bet | bet player = player ] ]
 ]
 
+{ #category : #accessing }
+PokerHand >> allInPlayers [
+	^ allInPlayers
+]
+
 { #category : #testing }
 PokerHand >> antePlacedFor: aPlayer [
 	^ self antes anySatisfy: [ :bet | bet player = aPlayer ]
@@ -135,16 +141,17 @@ PokerHand >> changesRoundDone [
 
 { #category : #'game - bets' }
 PokerHand >> chipsToCallFirstBetFor: aPlayer [
-	| topFirstBet playersFirstBet |
+	| topFirstBetter topFirstBet playersFirstBet |
 	^ self firstBets
 		ifEmpty: [ 0 ]
-		ifNotEmpty: [ topFirstBet := (self firstBets detectMax: [ :bet | bet chipsCount ])
-				chipsCount.
+		ifNotEmpty: [ topFirstBetter := self activePlayers
+				detectMax: [ :player | self totalFirstBetsFor: player ].
+			topFirstBet := self totalFirstBetsFor: topFirstBetter.
 			playersFirstBet := self firstBets
 				detect: [ :bet | bet player = aPlayer ]
 				ifFound: [ :bet | bet chipsCount ]
 				ifNone: [ 0 ].
-			topFirstBet - playersFirstBet ]
+			topFirstBet - playersFirstBet min: aPlayer chipsCount ]
 ]
 
 { #category : #'game - bets' }
@@ -252,13 +259,17 @@ PokerHand >> firstBets [
 
 { #category : #testing }
 PokerHand >> firstBetsAreEven [
-	^ (self activePlayers
-		collect: [ :player | 
-			| playerFirstBets |
-			playerFirstBets := self firstBets
-				select: [ :bet | bet player = player ].
-			playerFirstBets sumNumbers: [ :bet | bet chipsCount ] ]) asSet size
-		= 1
+	^ self activePlayers
+		allSatisfy: [ :active | 
+			| totalInPot |
+			totalInPot := self totalInPotFor: active.
+			(self allInPlayers includes: active)
+				ifTrue: [ self activePlayers
+						allSatisfy: [ :other | (self totalInPotFor: other) >= totalInPot ] ]
+				ifFalse: [ self activePlayers
+						allSatisfy: [ :other | 
+							(self allInPlayers includes: other)
+								| ((self totalInPotFor: other) = totalInPot) ] ] ]
 ]
 
 { #category : #testing }
@@ -293,8 +304,14 @@ PokerHand >> initialize [
 
 	players := OrderedCollection new.
 	discarded := OrderedCollection new.
+	allInPlayers := OrderedCollection new.
 	pot := OrderedCollection new.
 	state := FreshState hand: self
+]
+
+{ #category : #testing }
+PokerHand >> isAllIn: aPlayer [
+	^ self allInPlayers includes: aPlayer
 ]
 
 { #category : #accessing }
@@ -310,6 +327,17 @@ PokerHand >> lastRaiser: anObject [
 { #category : #accessing }
 PokerHand >> leader [
 	^ self players after: dealer ifAbsent: self players first
+]
+
+{ #category : #game }
+PokerHand >> markAsAllIn: aPlayer [
+	self allInPlayers add: aPlayer
+]
+
+{ #category : #'game - bets' }
+PokerHand >> partialPots [
+	^ self allInPlayers
+		collect: [ :player | PartialPot player: player hand: self ]
 ]
 
 { #category : #game }
@@ -408,13 +436,13 @@ PokerHand >> secondBets [
 
 { #category : #testing }
 PokerHand >> secondBetsAreEven [
-	^ (self activePlayers
-		collect: [ :player | 
-			| playerSecondBets |
-			playerSecondBets := self secondBets
-				select: [ :bet | bet player = player ].
-			playerSecondBets sumNumbers: [ :bet | bet chipsCount ] ]) asSet
-		size = 1
+	^ self activePlayers
+		allSatisfy: [ :active | 
+			| totalInPot |
+			totalInPot := self totalInPotFor: active.
+			self activePlayers
+				allSatisfy:
+					[ :other | (self totalInPotFor: other) >= totalInPot | (self isAllIn: other) ] ]
 ]
 
 { #category : #testing }
@@ -455,6 +483,18 @@ PokerHand >> state [
 { #category : #accessing }
 PokerHand >> state: anObject [
 	state := anObject
+]
+
+{ #category : #'game - bets' }
+PokerHand >> totalFirstBetsFor: aPlayer [
+	^ (self firstBets select: [ :bet | bet player = aPlayer ])
+		sumNumbers: #chipsCount
+]
+
+{ #category : #'game - bets' }
+PokerHand >> totalInPotFor: aPlayer [
+	^ (self pot select: [ :bet | bet player = aPlayer ])
+		sumNumbers: #chipsCount
 ]
 
 { #category : #game }

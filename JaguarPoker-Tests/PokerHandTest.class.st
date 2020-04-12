@@ -107,9 +107,66 @@ PokerHandTest >> testEnableCardsChange [
 
 { #category : #test }
 PokerHandTest >> testFirstBetsRoundDone [
+	"Smallhand order is: fede > nacho > wainer > mono"
 	smallHand players do: [ :player | smallHand placeAnteFor: player ].
 	smallHand deal.
 	self deny: smallHand firstBetsRoundDone.
+	smallHand passPlayer: nacho.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand placeFirstBet: 10 for: wainer.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand foldPlayer: mono.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand raiseFirstBet: 5 for: fede.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand callFirstBetFor: nacho.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand callFirstBetFor: wainer.
+	self assert: smallHand firstBetsRoundDone.
+]
+
+{ #category : #test }
+PokerHandTest >> testFirstBetsRoundDone2 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | player chips: 100 ].
+	nacho chips: 10.
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	smallHand deal.
+	smallHand
+		placeFirstBet: 5 for: nacho;
+		callFirstBetFor: wainer;
+		raiseFirstBet: 10 for: mono;
+		callFirstBetFor: fede.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand callFirstBetFor: nacho.
+	self assert: nacho chipsCount equals: 0.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand callFirstBetFor: wainer.
+	self assert: smallHand firstBetsRoundDone.
+]
+
+{ #category : #test }
+PokerHandTest >> testFirstBetsRoundDone3 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | player chips: 100 ].
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	smallHand deal.
+	smallHand
+		placeFirstBet: 20 for: nacho;
+		raiseFirstBet: 3 for: wainer;
+		callFirstBetFor: mono;
+		callFirstBetFor: fede;
+		raiseFirstBet: 76 for: nacho.
+	self assert: (smallHand chipsToCallFirstBetFor: wainer) equals: 76.
+	self assert: (smallHand chipsToCallFirstBetFor: fede) equals: 76.
+	self deny: smallHand firstBetsRoundDone.
+	smallHand
+		callFirstBetFor: wainer;
+		callFirstBetFor: mono;
+		callFirstBetFor: fede.
+	self assert: smallHand firstBetsRoundDone
 ]
 
 { #category : #test }
@@ -245,4 +302,61 @@ PokerHandTest >> testRotateSpeaker4 [
 	self assert: smallHand speaker equals: nacho.
 	smallHand foldPlayer: nacho.
 	self assert: smallHand speaker equals: wainer.
+]
+
+{ #category : #test }
+PokerHandTest >> testSecondBetsRoundDone [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | player chips: 100 ].
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	smallHand deal.
+	smallHand
+		placeFirstBet: 20 for: nacho;
+		callFirstBetFor: wainer;
+		callFirstBetFor: mono;
+		callFirstBetFor: fede.
+	self assert: smallHand firstBetsRoundDone.
+	self deny: smallHand secondBetsRoundDone.
+	smallHand enableCardsChange.
+	smallHand players do: [ :player | smallHand change: {} to: player ].
+	smallHand acceptBets.
+	smallHand
+		placeSecondBet: 20 for: nacho;
+		placeSecondBet: 20 for: wainer;
+		raiseSecondBet: 30 for: mono.
+	self deny: smallHand secondBetsRoundDone.
+	smallHand
+		placeSecondBet: 50 for: fede;
+		placeSecondBet: 30 for: nacho;
+		placeSecondBet: 30 for: wainer.
+	self assert: smallHand secondBetsRoundDone
+]
+
+{ #category : #test }
+PokerHandTest >> testSecondBetsRoundDone2 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	smallHand players do: [ :player | player chips: 100 ].
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	smallHand deal.
+	smallHand
+		placeFirstBet: 20 for: nacho;
+		callFirstBetFor: wainer;
+		callFirstBetFor: mono;
+		callFirstBetFor: fede.
+	self assert: smallHand firstBetsRoundDone.
+	self deny: smallHand secondBetsRoundDone.
+	smallHand enableCardsChange.
+	smallHand players do: [ :player | smallHand change: {} to: player ].
+	smallHand acceptBets.
+	smallHand
+		placeSecondBet: 20 for: nacho;
+		foldPlayer: wainer;
+		raiseSecondBet: 30 for: mono.
+	self deny: smallHand secondBetsRoundDone.
+	smallHand
+		placeSecondBet: 50 for: fede;
+		placeSecondBet: 30 for: nacho.
+	self assert: smallHand secondBetsRoundDone
 ]

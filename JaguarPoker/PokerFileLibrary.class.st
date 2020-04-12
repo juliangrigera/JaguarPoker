@@ -557,7 +557,14 @@ PokerFileLibrary >> styleCssContent [
 		border: 2px dotted #efe;
 		}
 	.folded{opacity: .5}
-	//.bettingOptions .col-md-4 { margin-left: 12px }
+	.badge.speaker{
+		background: yellow;
+		color: #990;
+		}
+	.badge.allin{
+		background: rgb(194, 73, 61);
+		color: #f7d5cc;
+		}
 	.bettingOptions .col-md-4, 	.bettingOptions .col-md-3  { padding: 2px }
 	.bettingOptions.handControl .col-md-4 { margin: 10px 0 0 0 }
 	.card{ margin: 2px}

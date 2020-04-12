@@ -33,21 +33,29 @@ BetState >> enableCardsShowing [
 
 { #category : #'game - bets' }
 BetState >> placeSecondBet: anInteger for: aPlayer [
-	| chipsToCall |
+	| chipsToCall allIn maxBet |
+	allIn := anInteger >= aPlayer chipsCount.
+	maxBet := anInteger min: aPlayer chipsCount.
 	chipsToCall := hand chipsToCallSecondBetFor: aPlayer.
-	hand addBet: (aPlayer getSecondBetOf: anInteger).
+	hand addBet: (aPlayer getSecondBetOf: maxBet).
 	anInteger > chipsToCall
 		ifTrue: [ hand lastRaiser: aPlayer ].
+	allIn
+		ifTrue: [ hand markAsAllIn: aPlayer ].
 	hand rotateSpeaker
 ]
 
 { #category : #'game - bets' }
 BetState >> raiseSecondBet: anInteger for: aPlayer [
-	| chipsToCall |
+	| chipsToCall bet allIn |
 	chipsToCall := hand chipsToCallSecondBetFor: aPlayer.
-	hand addBet: (aPlayer getSecondBetOf: chipsToCall + anInteger).
+	bet := chipsToCall + anInteger.
+	allIn := bet >= aPlayer chipsCount.
+	hand addBet: (aPlayer getSecondBetOf: bet).
 	anInteger > 0
 		ifTrue: [ hand lastRaiser: aPlayer ].
+	allIn
+		ifTrue: [ hand markAsAllIn: aPlayer ].
 	hand rotateSpeaker
 ]
 

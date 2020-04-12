@@ -19,6 +19,11 @@ PokerHandView class >> game: aPokerGame [
 		yourself
 ]
 
+{ #category : #testing }
+PokerHandView >> allIn [
+	^ self hand isAllIn: self currentPlayer
+]
+
 { #category : #accessing }
 PokerHandView >> bid [
 	^ bid
@@ -119,6 +124,23 @@ PokerHandView >> raiseFirstBet: aString for: aPlayer [
 PokerHandView >> raiseSecondBet: aString for: aPlayer [
 	self hand raiseSecondBet: aString asNumber for: aPlayer.
 	self bid: 0
+]
+
+{ #category : #'rendering - player' }
+PokerHandView >> renderAllInIndicatorFor: aPlayer on: html [
+	(self hand allInPlayers includes: aPlayer)
+		ifTrue: [ html space.
+			html tbsBadge
+				class: #allin;
+				with: 'jugado' ]
+]
+
+{ #category : #'rendering - visitor' }
+PokerHandView >> renderCall: chipsToMatch buttonOn: html [
+	html anchor
+		class: 'btn btn-default btn-sm';
+		callback: [ self placeFirstBet: chipsToMatch for: self currentPlayer ];
+		with: 'ver ' , chipsToMatch printString
 ]
 
 { #category : #rendering }
@@ -251,8 +273,32 @@ PokerHandView >> renderDiscardedOn: html [
 ]
 
 { #category : #'rendering - visitor' }
+PokerHandView >> renderFirstBetFormOn: html [
+	html
+		tbsColumn: [ html textInput
+				tbsFormControl;
+				class: 'input-sm';
+				on: #bid of: self;
+				placeholder: 'apuesta' ]
+		mediumSize: 4.
+	html
+		tbsColumn: [ self hand firstBetsPlaced
+				ifTrue: [ self renderRaiseFirstBetSubmitButtonOn: html ]
+				ifFalse: [ self renderFirstBetSubmitButtonOn: html ] ]
+		mediumSize: 3
+]
+
+{ #category : #'rendering - visitor' }
+PokerHandView >> renderFirstBetSubmitButtonOn: html [
+	html tbsSubmitButton
+		class: 'btn btn-default btn-sm';
+		callback: [ self placeFirstBet: self bid for: self currentPlayer ];
+		with: 'apostar'
+]
+
+{ #category : #'rendering - visitor' }
 PokerHandView >> renderFoldButtonOn: html [
-	^ html anchor
+	html anchor
 		class: 'btn btn-danger btn-sm';
 		callback: [ self foldPlayer: self currentPlayer ];
 		with: 'irse'
@@ -272,7 +318,8 @@ PokerHandView >> renderIndicatorsFor: aPlayer on: html [
 		small: [ self
 				renderDealerIndicatorFor: aPlayer on: html;
 				renderFoldedIndicatorFor: aPlayer on: html;
-				renderSpeakerIndicatorFor: aPlayer on: html ]
+				renderSpeakerIndicatorFor: aPlayer on: html;
+				renderAllInIndicatorFor: aPlayer on: html ]
 ]
 
 { #category : #'rendering - player' }
@@ -326,9 +373,20 @@ PokerHandView >> renderOwnPlayer: player panelOn: html [
 	html paragraph: [ self renderPlayer: player controlsOn: html ]
 ]
 
+{ #category : #rendering }
+PokerHandView >> renderPartialPotsOn: html [
+	self hand partialPots
+		do: [ :partialPot | 
+			html heading level4 with: partialPot player name.
+			html
+				paragraph: [ html
+						text: ' va por ';
+						text: partialPot chipsCount ] ]
+]
+
 { #category : #'rendering - visitor' }
 PokerHandView >> renderPassButtonOn: html [
-	^ html anchor
+	html anchor
 		class: 'btn btn-warning btn-sm';
 		callback: [ self passPlayer: self currentPlayer ];
 		with: 'pasar'
@@ -359,7 +417,19 @@ PokerHandView >> renderPlayersOn: html [
 PokerHandView >> renderPotOn: html [
 	html heading level4 with: 'Pozo'.
 	html paragraph: 'Total: ' , self hand potSize printString.
-	self hand pot do: [ :bet | html paragraph: bet ]
+	html
+		tbsRow: [ html
+				tbsColumn: [ self hand pot do: [ :bet | html paragraph: bet ] ]
+					mediumSize: 6;
+				tbsColumn: [ self renderPartialPotsOn: html ] mediumSize: 6 ]
+]
+
+{ #category : #'rendering - visitor' }
+PokerHandView >> renderRaiseFirstBetSubmitButtonOn: html [
+	html tbsSubmitButton
+		class: 'btn btn-default btn-sm';
+		callback: [ self raiseFirstBet: self bid for: self currentPlayer ];
+		with: 'subir'
 ]
 
 { #category : #rendering }
@@ -403,7 +473,7 @@ PokerHandView >> renderSecondBetFormOn: html [
 
 { #category : #'rendering - visitor' }
 PokerHandView >> renderShowCardsButtonOn: html [
-	^ html tbsSubmitButton
+	html tbsSubmitButton
 		class: 'btn btn-success btn-sm';
 		callback: [ self showCards ];
 		with: 'mostrar cartas'
@@ -413,7 +483,9 @@ PokerHandView >> renderShowCardsButtonOn: html [
 PokerHandView >> renderSpeakerIndicatorFor: aPlayer on: html [
 	aPlayer = self hand speaker
 		ifTrue: [ html space.
-			html tbsBadge: 'habla' ]
+			html tbsBadge
+				class: #speaker;
+				with: 'habla' ]
 ]
 
 { #category : #'rendering - visitor' }
@@ -442,20 +514,16 @@ PokerHandView >> showCards [
 PokerHandView >> visitBiddingHand: aBetState with: html [
 	self isSpeaker
 		ifTrue: [ self renderStopRefreshScriptOn: html.
-			self renderSecondBetFormOn: html.
+			self allIn
+				ifFalse: [ self renderSecondBetFormOn: html ].
 			html tbsRow
 				class: #bettingOptions;
 				class: #handControl;
-				with: [ html tbsColumn
-						mediumSize: 4;
-						with: [ (self hand chipsToCallSecondBetFor: self currentPlayer) = 0
-								ifTrue: [ self renderPassButtonOn: html ] ].
-					html tbsColumn
-						mediumSize: 4;
-						with: [ html anchor
-								class: 'btn btn-danger btn-sm';
-								callback: [ self foldPlayer: self currentPlayer ];
-								with: 'irse' ] ] ]
+				with: [ html
+						tbsColumn: [ self allIn | ((self hand chipsToCallSecondBetFor: self currentPlayer) = 0)
+								ifTrue: [ self renderPassButtonOn: html ] ]
+							mediumSize: 4;
+						tbsColumn: [ self renderFoldButtonOn: html ] mediumSize: 4 ] ]
 ]
 
 { #category : #'rendering - visitor' }
@@ -470,53 +538,28 @@ PokerHandView >> visitChangingCardsHand: aHand with: html [
 
 { #category : #'rendering - visitor' }
 PokerHandView >> visitDealtHand: aHand with: html [
-	| chipsToMatch |
-	chipsToMatch := self hand chipsToCallFirstBetFor: self currentPlayer.
+	| chipsToCall |
+	chipsToCall := self hand chipsToCallFirstBetFor: self currentPlayer.
 	self isSpeaker
 		ifTrue: [ self renderStopRefreshScriptOn: html.
 			html tbsRow
 				class: #bettingOptions;
-				with: [ html
-						tbsColumn: [ html textInput
-								tbsFormControl;
-								class: 'input-sm';
-								on: #bid of: self;
-								placeholder: 'apuesta' ]
-						mediumSize: 4.
-					html
-						tbsColumn: [ | caption |
-							caption := self hand firstBetsPlaced
-								ifTrue: [ 'subir' ]
-								ifFalse: [ 'apostar' ].
-							html tbsSubmitButton
-								class: 'btn btn-default btn-sm';
-								callback: [ self raiseFirstBet: self bid for: self currentPlayer ];
-								with: caption ]
-						mediumSize: 3.
-					chipsToMatch > 0
+				with: [ self renderFirstBetFormOn: html.
+					chipsToCall > 0
 						ifTrue: [ html
-								tbsColumn: [ html anchor
-										class: 'btn btn-default btn-sm';
-										callback: [ self placeFirstBet: chipsToMatch for: self currentPlayer ];
-										with: 'ver ' , chipsToMatch printString ]
+								tbsColumn: [ self renderCall: chipsToCall buttonOn: html ]
 								mediumSize: 3 ] ].
 			html tbsRow
 				class: #bettingOptions;
-				with: [ (self hand chipsToCallFirstBetFor: self currentPlayer) = 0
+				with: [ chipsToCall = 0
 						ifTrue: [ html tbsColumn
 								mediumSize: 4;
 								class: #fold;
-								with: [ html anchor
-										class: 'btn btn-warning btn-sm';
-										callback: [ self passPlayer: self currentPlayer ];
-										with: 'pasar' ] ].
+								with: [ self renderPassButtonOn: html ] ].
 					html tbsColumn
 						mediumSize: 4;
 						class: #fold;
-						with: [ html anchor
-								class: 'btn btn-danger btn-sm';
-								callback: [ self foldPlayer: self currentPlayer ];
-								with: 'irse' ] ] ]
+						with: [ self renderFoldButtonOn: html ] ] ]
 ]
 
 { #category : #'rendering - visitor' }

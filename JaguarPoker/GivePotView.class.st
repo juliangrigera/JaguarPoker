@@ -6,7 +6,8 @@ Class {
 	#superclass : #WAComponent,
 	#instVars : [
 		'hand',
-		'shares'
+		'shares',
+		'chips'
 	],
 	#category : #'JaguarPoker-Web'
 }
@@ -18,18 +19,25 @@ GivePotView class >> hand: aPokerHand [
 		yourself
 ]
 
+{ #category : #accessing }
+GivePotView >> chips [
+	^ chips
+]
+
+{ #category : #accessing }
+GivePotView >> chips: anObject [
+	chips := anObject
+]
+
 { #category : #controlling }
 GivePotView >> givePot [
 	| pot |
 	pot := self hand potSize.
-	self shares
+	self chips
 		keysAndValuesDo: [ :player :share | 
-			| integerShare |
 			share
-				ifNotNil: [ integerShare := (self hand potSize * share asNumber / 100) floor.
-					player getChips: integerShare.
-					pot := pot - integerShare ] ].
-	self hand dealer getChips: pot.
+				ifNotNil: [ player getChips: share.
+					pot := pot - share ] ].
 	self hand resetPot.
 	self answer
 ]
@@ -47,7 +55,8 @@ GivePotView >> hand: aPokerHand [
 { #category : #initialization }
 GivePotView >> initialize [
 	super initialize.
-	shares := Dictionary new
+	shares := Dictionary new.
+	chips := Dictionary new
 ]
 
 { #category : #rendering }
@@ -62,19 +71,63 @@ GivePotView >> renderCard: card on: html [
 { #category : #rendering }
 GivePotView >> renderContentOn: html [
 	html
-		tbsContainer: [ html heading: 'Repartir Pozo'.
+		tbsContainerFluid: [ html heading: 'Repartir Pozo'.
 			html heading level3
 				with: [ html
 						text: self hand potSize;
 						space;
 						text: #fichas ].
 			html
-				tbsForm: [ self hand activePlayers
-						do: [ :player | self renderPlayer: player percentageInputOn: html ].
+				tbsForm: [ self renderPlayersOn: html.
 					html tbsSubmitButton
 						class: 'btn btn-success btn-lg';
 						callback: [ self givePot ];
 						with: 'Repartir' ] ]
+]
+
+{ #category : #rendering }
+GivePotView >> renderPlayer: player cardsOn: html [
+	html
+		paragraph: [ player visibleCards do: [ :card | self renderCard: card on: html ] ]
+]
+
+{ #category : #rendering }
+GivePotView >> renderPlayer: player chipsInputOn: html [
+	html
+		tbsFormGroup: [ self
+				renderPlayer: player nameOn: html;
+				renderPlayer: player chipsTextInputOn: html;
+				renderPlayer: player giveAllButonOn: html;
+				renderPlayer: player cardsOn: html ]
+]
+
+{ #category : #rendering }
+GivePotView >> renderPlayer: player chipsTextInputOn: html [
+	html textInput
+		tbsFormControl;
+		id: player name asValidSelector;
+		callback: [ :playerChips | 
+			playerChips ~= '' & playerChips isNotNil
+				ifTrue: [ self chips at: player put: playerChips asNumber ] ];
+		placeholder: 'fichas'
+]
+
+{ #category : #rendering }
+GivePotView >> renderPlayer: player giveAllButonOn: html [
+	| maxPotSize |
+	maxPotSize := self hand partialPots
+		detect: [ :partialPot | partialPot player = player ]
+		ifFound: [ :pot | pot chipsCount ]
+		ifNone: [ self hand potSize ].
+	html anchor
+		class: 'btn btn-default btn-sm';
+		onClick: ((html jQuery id: player name asValidSelector) value: maxPotSize);
+		with: 'Otorgar ' , maxPotSize printString
+]
+
+{ #category : #rendering }
+GivePotView >> renderPlayer: player nameOn: html [
+	html heading level3 with: player name
 ]
 
 { #category : #rendering }
@@ -93,6 +146,16 @@ GivePotView >> renderPlayer: player percentageInputOn: html [
 	html
 		paragraph:
 			[ player visibleCards do: [ :card | self renderCard: card on: html ] ]
+]
+
+{ #category : #rendering }
+GivePotView >> renderPlayersOn: html [
+	html
+		tbsRow: [ self hand activePlayers
+				do: [ :player | 
+					html
+						tbsColumn: [ self renderPlayer: player chipsInputOn: html ]
+						mediumSize: 2 ] ]
 ]
 
 { #category : #accessing }

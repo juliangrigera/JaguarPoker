@@ -59,6 +59,11 @@ Player >> chips: anObject [
 	chips := anObject
 ]
 
+{ #category : #accessing }
+Player >> chipsCount [
+	^ self chips
+]
+
 { #category : #game }
 Player >> discard: someCards [
 	self cards removeAll: someCards.
@@ -89,14 +94,18 @@ Player >> getChips: anInteger [
 
 { #category : #'game - bets' }
 Player >> getFirstBetOf: anInteger [
-	self chips: self chips - anInteger.
-	^ FirstBet of: anInteger for: self
+	| bet |
+	bet := anInteger min: self chipsCount.
+	self chips: self chips - bet.
+	^ FirstBet of: bet for: self
 ]
 
 { #category : #'game - bets' }
 Player >> getSecondBetOf: anInteger [
-	self chips: self chips - anInteger.
-	^ SecondBet of: anInteger for: self
+	| bet |
+	bet := anInteger min: self chipsCount.
+	self chips: self chips - bet.
+	^ SecondBet of: bet for: self
 ]
 
 { #category : #initialization }
