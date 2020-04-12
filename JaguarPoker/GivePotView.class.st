@@ -30,6 +30,7 @@ GivePotView >> givePot [
 					player getChips: integerShare.
 					pot := pot - integerShare ] ].
 	self hand dealer getChips: pot.
+	self hand resetPot.
 	self answer
 ]
 

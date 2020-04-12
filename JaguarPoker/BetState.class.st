@@ -28,14 +28,27 @@ BetState >> enableCardsShowing [
 	self hand secondBetsAreEven
 		ifTrue: [ self hand
 				state: (ShowCardsState hand: self hand);
-				rotateSpeaker ]
+				speaker: hand lastRaiser ]
 ]
 
 { #category : #'game - bets' }
 BetState >> placeSecondBet: anInteger for: aPlayer [
-	hand
-		addBet: (aPlayer getSecondBetOf: anInteger);
-		rotateSpeaker
+	| chipsToCall |
+	chipsToCall := hand chipsToCallSecondBetFor: aPlayer.
+	hand addBet: (aPlayer getSecondBetOf: anInteger).
+	anInteger > chipsToCall
+		ifTrue: [ hand lastRaiser: aPlayer ].
+	hand rotateSpeaker
+]
+
+{ #category : #'game - bets' }
+BetState >> raiseSecondBet: anInteger for: aPlayer [
+	| chipsToCall |
+	chipsToCall := hand chipsToCallSecondBetFor: aPlayer.
+	hand addBet: (aPlayer getSecondBetOf: chipsToCall + anInteger).
+	anInteger > 0
+		ifTrue: [ hand lastRaiser: aPlayer ].
+	hand rotateSpeaker
 ]
 
 { #category : #game }

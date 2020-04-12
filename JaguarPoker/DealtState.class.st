@@ -42,6 +42,16 @@ DealtState >> placeFirstBet: anInteger for: aPlayer [
 	hand rotateSpeaker
 ]
 
+{ #category : #visitor }
+DealtState >> raiseFirstBet: anInteger for: aPlayer [
+	| chipsToCall |
+	chipsToCall := hand chipsToCallFirstBetFor: aPlayer.
+	hand addBet: (aPlayer getFirstBetOf: chipsToCall + anInteger).
+	anInteger > 0
+		ifTrue: [ hand lastRaiser: aPlayer ].
+	hand rotateSpeaker
+]
+
 { #category : #game }
 DealtState >> rotateSpeaker [
 	self hand firstBetsRoundDone

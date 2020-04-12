@@ -109,6 +109,18 @@ PokerHandView >> placeSecondBet: aString for: aPlayer [
 	self bid: 0
 ]
 
+{ #category : #controlling }
+PokerHandView >> raiseFirstBet: aString for: aPlayer [
+	self hand raiseFirstBet: aString asNumber for: aPlayer.
+	self bid: 0
+]
+
+{ #category : #controlling }
+PokerHandView >> raiseSecondBet: aString for: aPlayer [
+	self hand raiseSecondBet: aString asNumber for: aPlayer.
+	self bid: 0
+]
+
 { #category : #rendering }
 PokerHandView >> renderCard: card on: html [
 	| cardId |
@@ -371,10 +383,14 @@ PokerHandView >> renderSecondBetFormOn: html [
 						placeholder: 'Apuesta' ]
 				mediumSize: 4.
 			html
-				tbsColumn: [ html tbsSubmitButton
+				tbsColumn: [ | caption |
+					caption := self hand secondBetsPlaced
+						ifTrue: [ 'subir' ]
+						ifFalse: [ 'apostar' ].
+					html tbsSubmitButton
 						class: 'btn btn-default btn-sm';
-						callback: [ self placeSecondBet: self bid for: self currentPlayer ];
-						with: 'apostar' ]
+						callback: [ self raiseSecondBet: self bid for: self currentPlayer ];
+						with: caption ]
 				mediumSize: 3.
 			chipsToMatch > 0
 				ifTrue: [ html
@@ -465,13 +481,17 @@ PokerHandView >> visitDealtHand: aHand with: html [
 								tbsFormControl;
 								class: 'input-sm';
 								on: #bid of: self;
-								placeholder: 'Apuesta' ]
+								placeholder: 'apuesta' ]
 						mediumSize: 4.
 					html
-						tbsColumn: [ html tbsSubmitButton
+						tbsColumn: [ | caption |
+							caption := self hand firstBetsPlaced
+								ifTrue: [ 'subir' ]
+								ifFalse: [ 'apostar' ].
+							html tbsSubmitButton
 								class: 'btn btn-default btn-sm';
-								callback: [ self placeFirstBet: self bid for: self currentPlayer ];
-								with: 'apostar' ]
+								callback: [ self raiseFirstBet: self bid for: self currentPlayer ];
+								with: caption ]
 						mediumSize: 3.
 					chipsToMatch > 0
 						ifTrue: [ html

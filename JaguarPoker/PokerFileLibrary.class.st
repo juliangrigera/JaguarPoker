@@ -548,7 +548,7 @@ PokerFileLibrary >> styleCss [
 PokerFileLibrary >> styleCssContent [
 	^ '
 	body{
-		background: radial-gradient(darkgreen, #030);
+		background: fixed radial-gradient(darkgreen, #030);
 		color: #efe;
 		}
 	.well{

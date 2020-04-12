@@ -262,6 +262,11 @@ PokerHand >> firstBetsAreEven [
 ]
 
 { #category : #testing }
+PokerHand >> firstBetsPlaced [
+	^ self firstBets isNotEmpty
+]
+
+{ #category : #testing }
 PokerHand >> firstBetsRoundDone [
 	^ self firstBetsAreEven
 		&
@@ -369,6 +374,21 @@ PokerHand >> potSize [
 	^ self pot sumNumbers: #chipsCount
 ]
 
+{ #category : #'game - bets' }
+PokerHand >> raiseFirstBet: anInteger for: aPlayer [
+	self state raiseFirstBet: anInteger for: aPlayer
+]
+
+{ #category : #'game - bets' }
+PokerHand >> raiseSecondBet: anInteger for: aPlayer [
+	self state raiseSecondBet: anInteger for: aPlayer
+]
+
+{ #category : #initializing }
+PokerHand >> resetPot [
+	pot := OrderedCollection new
+]
+
 { #category : #private }
 PokerHand >> resetSpeaker [
 	self
@@ -395,6 +415,11 @@ PokerHand >> secondBetsAreEven [
 				select: [ :bet | bet player = player ].
 			playerSecondBets sumNumbers: [ :bet | bet chipsCount ] ]) asSet
 		size = 1
+]
+
+{ #category : #testing }
+PokerHand >> secondBetsPlaced [
+	^ self secondBets isNotEmpty
 ]
 
 { #category : #testing }
