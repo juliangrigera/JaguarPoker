@@ -170,6 +170,27 @@ PokerHandTest >> testFirstBetsRoundDone3 [
 ]
 
 { #category : #test }
+PokerHandTest >> testFirstBetsRoundDone4 [
+	"Smallhand order is: fede > nacho > wainer > mono"
+
+	fede chips: 100. nacho chips: 5. wainer chips: 9. mono chips: 100.
+	smallHand players do: [ :player | smallHand placeAnteFor: player ].
+	smallHand deal.
+	smallHand
+		placeFirstBet: 2 for: fede;
+		raiseFirstBet: 2 for: nacho;
+		callFirstBetFor: wainer;
+		raiseFirstBet: 15 for: mono;
+		callFirstBetFor: fede;
+		callFirstBetFor: wainer.
+	self assert: (smallHand totalFirstBetsFor: fede) equals: 19.
+	self assert: (smallHand totalFirstBetsFor: nacho) equals: 4.
+	self assert: (smallHand totalFirstBetsFor: wainer) equals: 8.
+	self assert: (smallHand totalFirstBetsFor: mono) equals: 19.
+	self assert: smallHand firstBetsRoundDone 
+]
+
+{ #category : #test }
 PokerHandTest >> testRotateSpeaker [
 	"Smallhand order is: fede > nacho > wainer > mono"
 

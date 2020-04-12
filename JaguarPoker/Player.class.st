@@ -12,7 +12,8 @@ Class {
 		'cards',
 		'passed',
 		'visibleCards',
-		'changedCards'
+		'changedCards',
+		'cashboxesCount'
 	],
 	#category : #'JaguarPoker-Model'
 }
@@ -42,6 +43,16 @@ Player >> cards: anObject [
 { #category : #accessing }
 Player >> cardsCount [
 	^ cards size
+]
+
+{ #category : #'game - bets' }
+Player >> cashboxValue [
+	^ 100
+]
+
+{ #category : #accessing }
+Player >> cashboxesCount [
+	^ cashboxesCount
 ]
 
 { #category : #accessing }
@@ -87,6 +98,12 @@ Player >> getAnteOf: chipsCount [
 	^ Ante of: chipsCount for: self
 ]
 
+{ #category : #'game - bets' }
+Player >> getCashbox [
+	cashboxesCount := cashboxesCount + 1.
+	self chips: self chips + self cashboxValue
+]
+
 { #category : #accessing }
 Player >> getChips: anInteger [
 	self chips: self chips + anInteger
@@ -110,7 +127,8 @@ Player >> getSecondBetOf: anInteger [
 
 { #category : #initialization }
 Player >> initialize [
-	chips := 100.
+	chips := self cashboxValue.
+	cashboxesCount := 1.
 	cards := OrderedCollection new.
 	changedCards := false.
 	passed := false.

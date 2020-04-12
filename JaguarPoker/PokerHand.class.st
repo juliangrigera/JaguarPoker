@@ -263,13 +263,9 @@ PokerHand >> firstBetsAreEven [
 		allSatisfy: [ :active | 
 			| totalInPot |
 			totalInPot := self totalInPotFor: active.
-			(self allInPlayers includes: active)
-				ifTrue: [ self activePlayers
-						allSatisfy: [ :other | (self totalInPotFor: other) >= totalInPot ] ]
-				ifFalse: [ self activePlayers
-						allSatisfy: [ :other | 
-							(self allInPlayers includes: other)
-								| ((self totalInPotFor: other) = totalInPot) ] ] ]
+			self activePlayers
+				allSatisfy:
+					[ :other | (self totalInPotFor: other) >= totalInPot | (self isAllIn: other) ] ]
 ]
 
 { #category : #testing }

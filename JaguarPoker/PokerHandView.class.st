@@ -344,7 +344,7 @@ PokerHandView >> renderOtherPlayer: player panelOn: html [
 					(player canShow: card)
 						ifTrue: [ self renderCard: card on: html ]
 						ifFalse: [ self renderCoveredCard: card on: html ] ] ].
-	html paragraph: player chips printString , ' fichas'
+	self renderPlayer: player chipsStatusOn: html
 ]
 
 { #category : #'rendering - player' }
@@ -369,7 +369,7 @@ PokerHandView >> renderOwnPlayer: player panelOn: html [
 	html div
 		class: #folded if: (self hand hasFolded: player);
 		with: [ player cards do: [ :card | self renderCard: card on: html ] ].
-	html paragraph: player chips printString , ' fichas'.
+	self renderPlayer: player chipsStatusOn: html.
 	html paragraph: [ self renderPlayer: player controlsOn: html ]
 ]
 
@@ -390,6 +390,19 @@ PokerHandView >> renderPassButtonOn: html [
 		class: 'btn btn-warning btn-sm';
 		callback: [ self passPlayer: self currentPlayer ];
 		with: 'pasar'
+]
+
+{ #category : #'rendering - player' }
+PokerHandView >> renderPlayer: player chipsStatusOn: html [
+	html
+		tbsRow: [ html
+				tbsColumn: [ html
+						strong: player chips printString;
+						text: ' fichas' ]
+					mediumSize: 6;
+				tbsColumn: [ player cashboxesCount
+						timesRepeat: [ html image url: PokerFileLibrary / #coffinPng ] ]
+					mediumSize: 6 ]
 ]
 
 { #category : #'rendering - player' }
@@ -564,11 +577,20 @@ PokerHandView >> visitDealtHand: aHand with: html [
 
 { #category : #'rendering - visitor' }
 PokerHandView >> visitFreshHand: aHand with: html [
-	(self hand antePlacedFor: self currentPlayer)
-		ifFalse: [ html tbsSubmitButton
-				class: 'btn btn-default btn-sm';
-				callback: [ self placeAnteFor: self currentPlayer ];
-				with: 'poner luz' ]
+	html
+		tbsRow: [ html
+				tbsColumn: [ (self hand antePlacedFor: self currentPlayer)
+						ifFalse: [ html tbsSubmitButton
+								class: 'btn btn-default btn-sm';
+								callback: [ self placeAnteFor: self currentPlayer ];
+								with: 'poner luz' ] ]
+					mediumSize: 6;
+				tbsColumn: [ html anchor
+						class: 'btn btn-warning btn-sm';
+						onClick: 'return confirm("¿Sacar una cajita?")';
+						callback: [ self currentPlayer getCashbox ];
+						with: 'sacar caja' ]
+					mediumSize: 6 ]
 ]
 
 { #category : #'rendering - visitor' }
