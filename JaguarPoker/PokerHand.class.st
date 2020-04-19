@@ -54,6 +54,7 @@ PokerHand >> accept: aHost with: aParameter [
 
 { #category : #game }
 PokerHand >> acceptBets [
+	self activePlayers do: [ :player | player passed: false ].
 	self state acceptBets
 ]
 
@@ -98,6 +99,13 @@ PokerHand >> antes [
 PokerHand >> callFirstBetFor: aPlayer [
 	self
 		placeFirstBet: (self chipsToCallFirstBetFor: aPlayer)
+		for: aPlayer
+]
+
+{ #category : #'game - bets' }
+PokerHand >> callSecondBetFor: aPlayer [
+	self
+		placeSecondBet: (self chipsToCallSecondBetFor: aPlayer)
 		for: aPlayer
 ]
 

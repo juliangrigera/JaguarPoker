@@ -381,3 +381,48 @@ PokerHandTest >> testSecondBetsRoundDone2 [
 		placeSecondBet: 30 for: nacho.
 	self assert: smallHand secondBetsRoundDone
 ]
+
+{ #category : #test }
+PokerHandTest >> testSecondBetsRoundDone3 [
+	| hand4 players |
+	players := {julio . pera . fede . wainer} asOrderedCollection.
+	hand4 := PokerHand players: players.
+	hand4 dealer: fede.
+	hand4 placeAnteFor: pera; placeAnteFor: julio; placeAnteFor: fede; placeAnteFor: wainer.
+	hand4 deal.
+	hand4 passPlayer: wainer; placeFirstBet: 8 for: julio; callFirstBetFor: pera; callFirstBetFor: fede; callFirstBetFor: wainer.
+	self assert: hand4 firstBetsRoundDone.
+	hand4 enableCardsChange.
+	players do: [ :player | hand4 change: {  } to: player ].
+	hand4 acceptBets.
+	self deny: hand4 secondBetsRoundDone.
+	hand4 passPlayer: julio.
+	self deny: hand4 secondBetsRoundDone.
+	hand4 passPlayer: pera.
+	self deny: hand4 secondBetsRoundDone.
+	hand4 passPlayer: fede.
+	self deny: hand4 secondBetsRoundDone.
+	hand4 passPlayer: wainer.
+	self assert: hand4 secondBetsRoundDone.
+]
+
+{ #category : #test }
+PokerHandTest >> testSecondBetsRoundDone4 [
+	| hand4 players |
+	players := {julio . pera . fede . wainer} asOrderedCollection.
+	hand4 := PokerHand players: players.
+	hand4 dealer: fede.
+	hand4 placeAnteFor: pera; placeAnteFor: julio; placeAnteFor: fede; placeAnteFor: wainer.
+	hand4 deal.
+	hand4 passPlayer: wainer; passPlayer: julio; passPlayer: pera; placeFirstBet: 10 for: fede; callFirstBetFor: wainer.
+	hand4 foldPlayer: julio; foldPlayer: pera.
+	self assert: hand4 firstBetsRoundDone.
+	hand4 enableCardsChange.
+	hand4 activePlayers do: [ :player | hand4 change: (player cards first:3) to: player ].
+	hand4 acceptBets.
+	self deny: hand4 secondBetsRoundDone.
+	hand4 passPlayer: fede.
+	self deny: hand4 secondBetsRoundDone.
+	hand4 placeSecondBet: 20 for: wainer; callSecondBetFor: fede.
+	self assert: hand4 secondBetsRoundDone.
+]
