@@ -240,6 +240,7 @@ PokerHandView >> renderControlsPanelOn: html [
 					on: html.
 			html anchor
 				class: 'btn btn-success btn-lg';
+				onClick: 'return confirm("¿Finalizar Mano y comenzar otra?")';
 				callback: [ self newHand ];
 				with: 'Nueva Mano' ]
 ]

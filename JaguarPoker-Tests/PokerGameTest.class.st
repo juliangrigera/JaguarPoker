@@ -11,7 +11,9 @@ Class {
 		'panda',
 		'julio',
 		'game',
-		'players'
+		'players',
+		'nacho',
+		'wainer'
 	],
 	#category : #'JaguarPoker-Tests-Model'
 }
@@ -21,6 +23,8 @@ PokerGameTest >> setUp [
 	santi := Player name: 'Santi'.
 	pera := Player name: 'Pera'.
 	nico := Player name: 'Nico'.
+	nacho := Player name: 'Nacho'.
+	wainer := Player name: 'Wainer'.
 	panda := Player name: 'Panda'.
 	julio := Player name: 'Julio'.
 	players := {santi.
@@ -30,6 +34,23 @@ PokerGameTest >> setUp [
 	julio}.
 	game := PokerGame players:
 		players asOrderedCollection
+]
+
+{ #category : #test }
+PokerGameTest >> testNewHand [
+	|game2 passedHand hand5|
+	players := { santi . nacho . pera . wainer . panda } asOrderedCollection.
+	game2 := (PokerGame players: players) dealer: pera; yourself.
+	game2 newHand.
+	passedHand := game2 currentPokerHand.
+	passedHand placeAnteFor: santi; placeAnteFor: pera; placeAnteFor: wainer; placeAnteFor: nacho; placeAnteFor: panda.
+	self assert: passedHand potSize equals: 5.
+	passedHand deal.
+	{ wainer . panda . santi . nacho . pera} do: [ :passer | passedHand passPlayer: passer ].
+	game2 newHand.
+	hand5 := game2 currentPokerHand.
+	hand5 placeAnteFor: santi; placeAnteFor: nacho; placeAnteFor: wainer; placeAnteFor: panda; placeAnteFor: pera.
+	self assert: hand5 potSize equals: 15
 ]
 
 { #category : #test }

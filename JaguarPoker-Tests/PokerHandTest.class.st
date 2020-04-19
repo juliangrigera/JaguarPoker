@@ -191,6 +191,23 @@ PokerHandTest >> testFirstBetsRoundDone4 [
 ]
 
 { #category : #test }
+PokerHandTest >> testFirstBetsRoundDone5 [
+	|game passedHand hand5 players|
+	players := { santi . nacho . pera . wainer . panda } asOrderedCollection.
+	game := (PokerGame players: players) dealer: pera; yourself.
+	game newHand.
+	passedHand := game currentPokerHand.
+	passedHand placeAnteFor: santi; placeAnteFor: pera; placeAnteFor: wainer; placeAnteFor: nacho; placeAnteFor: panda.
+	passedHand deal.
+	{ wainer . panda . santi . nacho . pera} do: [ :passer | passedHand passPlayer: passer ].
+	game newHand.
+	hand5 := game currentPokerHand.
+	hand5 placeAnteFor: santi; placeAnteFor: nacho; placeAnteFor: wainer; placeAnteFor: panda; placeAnteFor: pera.
+	self assert: hand5 potSize equals: 15
+	
+]
+
+{ #category : #test }
 PokerHandTest >> testRotateSpeaker [
 	"Smallhand order is: fede > nacho > wainer > mono"
 
@@ -386,8 +403,7 @@ PokerHandTest >> testSecondBetsRoundDone2 [
 PokerHandTest >> testSecondBetsRoundDone3 [
 	| hand4 players |
 	players := {julio . pera . fede . wainer} asOrderedCollection.
-	hand4 := PokerHand players: players.
-	hand4 dealer: fede.
+	hand4 := PokerHand players: players dealer: fede.
 	hand4 placeAnteFor: pera; placeAnteFor: julio; placeAnteFor: fede; placeAnteFor: wainer.
 	hand4 deal.
 	hand4 passPlayer: wainer; placeFirstBet: 8 for: julio; callFirstBetFor: pera; callFirstBetFor: fede; callFirstBetFor: wainer.
@@ -410,8 +426,7 @@ PokerHandTest >> testSecondBetsRoundDone3 [
 PokerHandTest >> testSecondBetsRoundDone4 [
 	| hand4 players |
 	players := {julio . pera . fede . wainer} asOrderedCollection.
-	hand4 := PokerHand players: players.
-	hand4 dealer: fede.
+	hand4 := PokerHand players: players dealer: fede.
 	hand4 placeAnteFor: pera; placeAnteFor: julio; placeAnteFor: fede; placeAnteFor: wainer.
 	hand4 deal.
 	hand4 passPlayer: wainer; passPlayer: julio; passPlayer: pera; placeFirstBet: 10 for: fede; callFirstBetFor: wainer.
