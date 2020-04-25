@@ -36,12 +36,24 @@ PokerHandView >> bid: anObject [
 
 { #category : #controlling }
 PokerHandView >> callFirstBetFor: aPlayer [
+	self log: aPlayer name , ' ve ' , (self hand chipsToCallFirstBetFor: aPlayer) printString.
 	self hand callFirstBetFor: aPlayer.
 	self bid: 0
 ]
 
 { #category : #controlling }
+PokerHandView >> callSecondBetFor: aPlayer [
+	self log: aPlayer name , ' ve ' , (self hand chipsToCallSecondBetFor: aPlayer) printString.
+	self hand callSecondBetFor: aPlayer.
+	self bid: 0
+]
+
+{ #category : #controlling }
 PokerHandView >> changeCardsTo: aPlayer [
+	self selectedCards
+		ifEmpty: [ self log: aPlayer name , ' va servido.' ]
+		ifNotEmpty: [ self
+				log: aPlayer name , ' cambió ' , self selectedCards size printString ].
 	self hand change: self selectedCards to: aPlayer.
 	self selectedCards: OrderedCollection new
 ]
@@ -53,6 +65,7 @@ PokerHandView >> currentPlayer [
 
 { #category : #controlling }
 PokerHandView >> foldPlayer: aPlayer [
+	self log: aPlayer name, ' se va.'.
 	self hand foldPlayer: aPlayer
 ]
 
@@ -86,6 +99,16 @@ PokerHandView >> isSpeaker [
 	^ self hand speaker = self session player
 ]
 
+{ #category : #accessing }
+PokerHandView >> log [
+	^ self hand log
+]
+
+{ #category : #accessing }
+PokerHandView >> log: aString [
+	self hand log: aString
+]
+
 { #category : #controlling }
 PokerHandView >> newHand [
 	self selectedCards: OrderedCollection new.
@@ -94,34 +117,40 @@ PokerHandView >> newHand [
 
 { #category : #controlling }
 PokerHandView >> passPlayer: aPlayer [
-	self hand passPlayer: aPlayer
+	self hand passPlayer: aPlayer.
+	self log: aPlayer name, ' pasa'
 ]
 
 { #category : #controlling }
 PokerHandView >> placeAnteFor: aPlayer [
-	self hand placeAnteFor: aPlayer
+	self hand placeAnteFor: aPlayer.
+	self log: aPlayer name, ' puso luz'
 ]
 
 { #category : #controlling }
 PokerHandView >> placeFirstBet: aString for: aPlayer [
 	self hand placeFirstBet: aString asNumber for: aPlayer.
-	self bid: 0
+	self bid: 0.
+	self log: aPlayer name , ' pone ' , aString printString 
 ]
 
 { #category : #controlling }
 PokerHandView >> placeSecondBet: aString for: aPlayer [
+	self log: aPlayer name, ' apuesta ', aString printString.
 	self hand placeSecondBet: aString asNumber for: aPlayer.
 	self bid: 0
 ]
 
 { #category : #controlling }
 PokerHandView >> raiseFirstBet: aString for: aPlayer [
+	self log: aPlayer name, ' sube ', aString printString.
 	self hand raiseFirstBet: aString asNumber for: aPlayer.
 	self bid: 0
 ]
 
 { #category : #controlling }
 PokerHandView >> raiseSecondBet: aString for: aPlayer [
+	self log: aPlayer name, ' sube ', aString.
 	self hand raiseSecondBet: aString asNumber for: aPlayer.
 	self bid: 0
 ]
@@ -138,8 +167,9 @@ PokerHandView >> renderAllInIndicatorFor: aPlayer on: html [
 { #category : #'rendering - visitor' }
 PokerHandView >> renderCall: chipsToMatch buttonOn: html [
 	html anchor
-		class: 'btn btn-default btn-sm';
-		callback: [ self placeFirstBet: chipsToMatch for: self currentPlayer ];
+		class: 'btn btn-default btn-sm';"
+		callback: [ self placeFirstBet: chipsToMatch for: self currentPlayer ];"
+		callback: [ self callFirstBetFor: self currentPlayer ];
 		with: 'ver ' , chipsToMatch printString
 ]
 
@@ -180,7 +210,14 @@ PokerHandView >> renderContentOn: html [
 										html: [ :r | self renderPotOn: r ];
 										interval: 2 seconds);
 								with: [ self renderPotOn: html ] ]
-							mediumSize: 7;
+							mediumSize: 4;
+						tbsColumn: [ html tbsWell
+								script:
+									(html jQuery this load
+										html: [ :r | self renderLogOn: r ];
+										interval: 2 seconds);
+								with: [ self renderLogOn: html ] ]
+							mediumSize: 3;
 						tbsColumn: [ html tbsWell
 								script:
 									(html jQuery this load
@@ -321,6 +358,13 @@ PokerHandView >> renderIndicatorsFor: aPlayer on: html [
 				renderFoldedIndicatorFor: aPlayer on: html;
 				renderSpeakerIndicatorFor: aPlayer on: html;
 				renderAllInIndicatorFor: aPlayer on: html ]
+]
+
+{ #category : #rendering }
+PokerHandView >> renderLogOn: html [
+	html heading level4 with: 'Bitácora'.
+	html
+		unorderedList: [ self log do: [ :message | html listItem: message ] ]
 ]
 
 { #category : #'rendering - player' }
@@ -480,7 +524,7 @@ PokerHandView >> renderSecondBetFormOn: html [
 				ifTrue: [ html
 						tbsColumn: [ html anchor
 								class: 'btn btn-default btn-sm';
-								callback: [ self placeSecondBet: chipsToMatch for: self currentPlayer ];
+								callback: [ self callSecondBetFor: self currentPlayer ];
 								with: 'ver ' , chipsToMatch printString ]
 						mediumSize: 3 ] ]
 ]

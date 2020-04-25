@@ -15,7 +15,8 @@ Class {
 		'pot',
 		'state',
 		'lastRaiser',
-		'allInPlayers'
+		'allInPlayers',
+		'log'
 	],
 	#category : #'JaguarPoker-Model'
 }
@@ -310,7 +311,8 @@ PokerHand >> initialize [
 	discarded := OrderedCollection new.
 	allInPlayers := OrderedCollection new.
 	pot := OrderedCollection new.
-	state := FreshState hand: self
+	state := FreshState hand: self.
+	log := OrderedCollection new
 ]
 
 { #category : #testing }
@@ -331,6 +333,16 @@ PokerHand >> lastRaiser: anObject [
 { #category : #accessing }
 PokerHand >> leader [
 	^ self players after: dealer ifAbsent: self players first
+]
+
+{ #category : #accessing }
+PokerHand >> log [
+	^ log
+]
+
+{ #category : #accessing }
+PokerHand >> log: aString [
+	self log add: aString
 ]
 
 { #category : #game }
