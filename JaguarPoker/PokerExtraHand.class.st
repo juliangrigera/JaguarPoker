@@ -1,3 +1,7 @@
+"
+A Hand after a Hand in which no player could place an initial bet
+Antes are duplicated until they hit 8
+"
 Class {
 	#name : #PokerExtraHand,
 	#superclass : #PokerHand,

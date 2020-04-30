@@ -102,6 +102,13 @@ PokerGame >> initialize [
 	players := OrderedCollection new
 ]
 
+{ #category : #accessing }
+PokerGame >> lesserCardValue [
+	^ self playersCount = 5
+		ifTrue: [ 6 ]
+		ifFalse: [ 7 ]
+]
+
 { #category : #private }
 PokerGame >> mustKeepAntes [
 	^ self currentPokerHand isNotNil

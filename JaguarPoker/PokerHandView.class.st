@@ -65,7 +65,7 @@ PokerHandView >> currentPlayer [
 
 { #category : #controlling }
 PokerHandView >> foldPlayer: aPlayer [
-	self log: aPlayer name, ' se va.'.
+	self log: aPlayer name, ' se va'.
 	self hand foldPlayer: aPlayer
 ]
 
@@ -77,6 +77,12 @@ PokerHandView >> game [
 { #category : #accessing }
 PokerHandView >> game: anObject [
 	game := anObject
+]
+
+{ #category : #controlling }
+PokerHandView >> getCashbox [
+	self log: self currentPlayer name, ' sacó una caja.'.
+	^ self currentPlayer getCashbox
 ]
 
 { #category : #accessing }
@@ -210,14 +216,14 @@ PokerHandView >> renderContentOn: html [
 										html: [ :r | self renderPotOn: r ];
 										interval: 2 seconds);
 								with: [ self renderPotOn: html ] ]
-							mediumSize: 4;
+							mediumSize: 5;
 						tbsColumn: [ html tbsWell
 								script:
 									(html jQuery this load
 										html: [ :r | self renderLogOn: r ];
 										interval: 2 seconds);
 								with: [ self renderLogOn: html ] ]
-							mediumSize: 3;
+							mediumSize: 2;
 						tbsColumn: [ html tbsWell
 								script:
 									(html jQuery this load
@@ -363,8 +369,9 @@ PokerHandView >> renderIndicatorsFor: aPlayer on: html [
 { #category : #rendering }
 PokerHandView >> renderLogOn: html [
 	html heading level4 with: 'Bitácora'.
-	html
-		unorderedList: [ self log do: [ :message | html listItem: message ] ]
+	html unorderedList
+		class: 'list-unstyled';
+		with: [ self log do: [ :message | html listItem: message ] ]
 ]
 
 { #category : #'rendering - player' }
@@ -452,7 +459,7 @@ PokerHandView >> renderPlayer: player chipsStatusOn: html [
 
 { #category : #'rendering - player' }
 PokerHandView >> renderPlayer: aPlayer controlsOn: html [
-	(self hand hasFolded: aPlayer)
+	(self hand hasFolded: aPlayer) & (self hand canSharePot not)
 		ifFalse: [ self hand accept: self with: html ]
 ]
 
@@ -564,6 +571,10 @@ PokerHandView >> selectedCards: someCards [
 { #category : #controlling }
 PokerHandView >> showCards [
 	self currentPlayer showCards: self selectedCards.
+	self
+		log:
+			self currentPlayer name , ' bajó '
+				, (self currentPlayer cardsHandInGame: self game) description.
 	self selectedCards: OrderedCollection new.
 	self hand rotateSpeaker
 ]
@@ -633,7 +644,7 @@ PokerHandView >> visitFreshHand: aHand with: html [
 				tbsColumn: [ html anchor
 						class: 'btn btn-warning btn-sm';
 						onClick: 'return confirm("¿Sacar una cajita?")';
-						callback: [ self currentPlayer getCashbox ];
+						callback: [ self getCashbox ];
 						with: 'sacar caja' ]
 					mediumSize: 6 ]
 ]

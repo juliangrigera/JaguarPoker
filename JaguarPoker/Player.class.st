@@ -45,6 +45,16 @@ Player >> cardsCount [
 	^ cards size
 ]
 
+{ #category : #game }
+Player >> cardsHand [
+	^ CardsHand fromCards: self visibleCards
+]
+
+{ #category : #game }
+Player >> cardsHandInGame: aPokerGame [
+	^ CardsHand fromCards: self visibleCards inGame: aPokerGame
+]
+
 { #category : #'game - bets' }
 Player >> cashboxValue [
 	^ 100

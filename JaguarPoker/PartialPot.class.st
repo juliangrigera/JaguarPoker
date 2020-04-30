@@ -1,3 +1,6 @@
+"
+A part of the pot that's reserved for a player who's all in
+"
 Class {
 	#name : #PartialPot,
 	#superclass : #Object,

@@ -156,10 +156,8 @@ PokerHand >> chipsToCallFirstBetFor: aPlayer [
 		ifNotEmpty: [ topFirstBetter := self activePlayers
 				detectMax: [ :player | self totalFirstBetsFor: player ].
 			topFirstBet := self totalFirstBetsFor: topFirstBetter.
-			playersFirstBet := self firstBets
-				detect: [ :bet | bet player = aPlayer ]
-				ifFound: [ :bet | bet chipsCount ]
-				ifNone: [ 0 ].
+			playersFirstBet := (self firstBets
+				select: [ :bet | bet player = aPlayer ]) sumNumbers: #chipsCount.
 			topFirstBet - playersFirstBet min: aPlayer chipsCount ]
 ]
 

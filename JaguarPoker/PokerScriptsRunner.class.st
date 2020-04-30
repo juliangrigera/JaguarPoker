@@ -1,3 +1,6 @@
+"
+Scripts for deployment
+"
 Class {
 	#name : #PokerScriptsRunner,
 	#superclass : #Object,

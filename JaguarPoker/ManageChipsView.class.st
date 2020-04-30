@@ -1,3 +1,7 @@
+"
+A simple editor to manage all players' chips
+Just in case :)
+"
 Class {
 	#name : #ManageChipsView,
 	#superclass : #WAComponent,

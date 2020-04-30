@@ -43,9 +43,21 @@ Card class >> value: aString suit: aSuit [
 		yourself
 ]
 
+{ #category : #comparing }
+Card >> <= aCard [
+	^ self numericValue <= aCard numericValue
+]
+
 { #category : #accessing }
 Card >> cssClassName [
 	^ (self suit name , self value asString) asSymbol
+]
+
+{ #category : #private }
+Card >> numericValue [
+	^ [ self value asNumber ]
+		on: Error
+		do: [ 10 + (#(J Q K A) indexOf: self value asSymbol) ]
 ]
 
 { #category : #printing }
