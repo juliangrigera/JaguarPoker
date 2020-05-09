@@ -221,14 +221,7 @@ PokerHand >> doDeal [
 
 { #category : #private }
 PokerHand >> doRotateSpeaker [
-	| nextSpeaker currentFolded |
-	currentFolded := (self activePlayers includes: self speaker) not.
-	nextSpeaker := currentFolded
-		ifTrue: [ self firstActiveAfter: self speaker ]
-		ifFalse: [ self activePlayers
-				after: self speaker
-				ifAbsent: [ self activePlayers first ] ].
-	self speaker: nextSpeaker
+	self speaker: (self firstActiveAfter: self speaker)
 ]
 
 { #category : #game }
@@ -288,6 +281,20 @@ PokerHand >> firstBetsRoundDone [
 				|
 					(self activePlayers
 						allSatisfy: [ :player | self placedFirstBet: player ]))
+]
+
+{ #category : #private }
+PokerHand >> firstBettingPlayerAfter: aPlayer [
+	| index |
+	index := self players indexOf: aPlayer.
+	(0 to: self players size - 2)
+		collect: [ :ix | 
+			| candidateIndex candidate |
+			candidateIndex := 1 + ((ix + index) % self players size).
+			candidate := self players at: candidateIndex.
+			(self activePlayers includes: candidate)
+				& (self isAllIn: candidate) not
+				ifTrue: [ ^ candidate ] ]
 ]
 
 { #category : #game }
@@ -471,7 +478,7 @@ PokerHand >> secondBetsRoundDone [
 			((self activePlayers allSatisfy: #passed)
 				|
 					(self activePlayers
-						allSatisfy: [ :player | self placedSecondBet: player ]))
+						allSatisfy: [ :player | (self isAllIn: player) | (self placedSecondBet: player) ]))
 ]
 
 { #category : #game }

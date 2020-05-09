@@ -362,6 +362,38 @@ PokerHandTest >> testRotateSpeaker4 [
 ]
 
 { #category : #test }
+PokerHandTest >> testRotateSpeaker5 [
+	| hand5 players |
+	players := {julio.nacho.santi.fede.panda} asOrderedCollection.
+	nacho chips: 16.
+	hand5 := PokerHand players: players dealer: nacho.
+	hand5
+		placeAnteFor: julio;
+		placeAnteFor: fede;
+		placeAnteFor: panda;
+		placeAnteFor: nacho;
+		placeAnteFor: santi.
+	hand5 deal.
+	hand5
+		passPlayer: santi;
+		placeFirstBet: 12 for: fede;
+		callFirstBetFor: panda;
+		callFirstBetFor: julio;
+		raiseFirstBet: 3 for: nacho;
+		callFirstBetFor: santi;
+		callFirstBetFor: fede;
+		callFirstBetFor: panda;
+		callFirstBetFor: julio.
+	self assert: hand5 firstBetsRoundDone.
+	hand5 enableCardsChange.
+	self assert: hand5 speaker equals: santi.
+	players
+		do: [ :player | hand5 change: (player cards first: 2) to: player ].
+	hand5 acceptBets.
+	self assert: hand5 speaker equals: santi
+]
+
+{ #category : #test }
 PokerHandTest >> testSecondBetsRoundDone [
 	"Smallhand order is: fede > nacho > wainer > mono"
 
@@ -459,4 +491,44 @@ PokerHandTest >> testSecondBetsRoundDone4 [
 	self deny: hand4 secondBetsRoundDone.
 	hand4 placeSecondBet: 20 for: wainer; callSecondBetFor: fede.
 	self assert: hand4 secondBetsRoundDone.
+]
+
+{ #category : #test }
+PokerHandTest >> testSecondBetsRoundDone5 [
+	| hand5 players |
+	players := {julio.	nacho.	santi.	fede.panda} asOrderedCollection.
+	nacho chips: 16. 
+	hand5 := PokerHand players: players dealer: nacho.
+	hand5
+		placeAnteFor: julio;
+		placeAnteFor: fede;
+		placeAnteFor: panda;
+		placeAnteFor: nacho;
+		placeAnteFor: santi.
+	hand5 deal.
+	hand5
+		passPlayer: santi;
+		placeFirstBet: 12 for: fede;
+		callFirstBetFor: panda;
+		callFirstBetFor: julio;
+		raiseFirstBet: 3 for: nacho;
+		callFirstBetFor: santi;
+		callFirstBetFor: fede;
+		callFirstBetFor: panda;
+		callFirstBetFor: julio.
+	self assert: hand5 firstBetsRoundDone.
+	hand5 enableCardsChange. 
+	self assert: hand5 speaker equals: santi.
+	players do: [ :player | hand5 change: (player cards first: 2) to: player  ].
+	hand5 acceptBets.
+	self assert: hand5 speaker equals: santi.
+	hand5
+		passPlayer: santi;
+		placeSecondBet: 15 for: fede;
+		callSecondBetFor: panda;
+		foldPlayer: julio.
+	self assert: hand5 speaker equals: santi.
+	hand5 foldPlayer: santi.
+	self assert: hand5 secondBetsRoundDone 
+
 ]

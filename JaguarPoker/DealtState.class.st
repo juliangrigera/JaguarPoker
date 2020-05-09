@@ -64,6 +64,12 @@ DealtState >> raiseFirstBet: anInteger for: aPlayer [
 { #category : #game }
 DealtState >> rotateSpeaker [
 	self hand firstBetsRoundDone
-		ifFalse: [ self hand doRotateSpeaker ]
+		ifFalse: [ self hand speaker: (self hand firstBettingPlayerAfter: self hand speaker) ]
 		ifTrue: [ self hand speaker: nil ]
+]
+
+{ #category : #game }
+DealtState >> speakingPlayers [
+	^ self hand activePlayers
+		reject: [ :bettingPlayer | self hand isAllIn: bettingPlayer ]
 ]

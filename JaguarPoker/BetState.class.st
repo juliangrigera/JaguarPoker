@@ -62,6 +62,12 @@ BetState >> raiseSecondBet: anInteger for: aPlayer [
 { #category : #game }
 BetState >> rotateSpeaker [
 	self hand secondBetsRoundDone
-		ifFalse: [ self hand doRotateSpeaker ]
+		ifFalse: [ self hand speaker: (self hand firstBettingPlayerAfter: self hand speaker) ]
 		ifTrue: [ self hand speaker: nil ]
+]
+
+{ #category : #game }
+BetState >> speakingPlayers [
+	^ self hand activePlayers
+		reject: [ :bettingPlayer | self hand isAllIn: bettingPlayer ]
 ]

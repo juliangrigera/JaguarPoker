@@ -19,7 +19,9 @@ ChangeCardsState >> accept: aHost with: aParameter [
 { #category : #game }
 ChangeCardsState >> acceptBets [
 	self hand state: (BetState hand: self hand).
-	self hand speaker: hand lastRaiser
+	(hand isAllIn: hand lastRaiser)
+		ifTrue: [ self hand speaker: (hand firstActiveAfter: hand lastRaiser) ]
+		ifFalse: [ self hand speaker: hand lastRaiser ]
 ]
 
 { #category : #testing }
@@ -30,6 +32,6 @@ ChangeCardsState >> canAcceptBets [
 { #category : #game }
 ChangeCardsState >> rotateSpeaker [
 	self hand changesRoundDone
-		ifFalse: [ self hand doRotateSpeaker ]
+		ifFalse: [ self hand speaker: (self hand firstActiveAfter: self hand speaker) ]
 		ifTrue: [ self hand speaker: nil ]
 ]

@@ -103,3 +103,8 @@ PokerHandState >> placeSecondBet: anInteger for: aPlayer [
 PokerHandState >> rotateSpeaker [
 	"Do nothing"
 ]
+
+{ #category : #game }
+PokerHandState >> speakingPlayers [
+	^ self hand activePlayers
+]
