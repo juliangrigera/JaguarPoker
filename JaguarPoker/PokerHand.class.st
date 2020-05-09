@@ -516,3 +516,15 @@ PokerHand >> useDiscardedAsDeck [
 	deck addAll: self discarded.
 	self discarded removeAll
 ]
+
+{ #category : #game }
+PokerHand >> winnersInGame: aPokerGame [
+	^ self activePlayers
+		select: [ :player | 
+			| others |
+			others := self activePlayers copyWithout: player.
+			others
+				noneSatisfy: [ :other | 
+					(other cardsHandInGame: aPokerGame)
+						beats: (player cardsHandInGame: aPokerGame) ] ]
+]

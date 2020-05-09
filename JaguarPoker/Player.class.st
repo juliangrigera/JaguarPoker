@@ -46,11 +46,6 @@ Player >> cardsCount [
 ]
 
 { #category : #game }
-Player >> cardsHand [
-	^ CardsHand fromCards: self visibleCards
-]
-
-{ #category : #game }
 Player >> cardsHandInGame: aPokerGame [
 	^ CardsHand fromCards: self visibleCards inGame: aPokerGame
 ]

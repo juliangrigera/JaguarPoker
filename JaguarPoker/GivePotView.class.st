@@ -7,7 +7,8 @@ Class {
 	#instVars : [
 		'hand',
 		'shares',
-		'chips'
+		'chips',
+		'winners'
 	],
 	#category : #'JaguarPoker-Web'
 }
@@ -16,6 +17,14 @@ Class {
 GivePotView class >> hand: aPokerHand [
 	^ self new
 		hand: aPokerHand;
+		yourself
+]
+
+{ #category : #'instance creation' }
+GivePotView class >> hand: aPokerHand winners: somePlayers [
+	^ self new
+		hand: aPokerHand;
+		winners: somePlayers;
 		yourself
 ]
 
@@ -54,9 +63,18 @@ GivePotView >> hand: aPokerHand [
 
 { #category : #initialization }
 GivePotView >> initialize [
+	"Check additional initialization in #winners:"
 	super initialize.
 	shares := Dictionary new.
 	chips := Dictionary new
+]
+
+{ #category : #accessing }
+GivePotView >> maxPotFor: player [
+	^ self hand partialPots
+		detect: [ :partialPot | partialPot player = player ]
+		ifFound: [ :pot | pot chipsCount ]
+		ifNone: [ self hand potSize ]
 ]
 
 { #category : #rendering }
@@ -82,7 +100,7 @@ GivePotView >> renderContentOn: html [
 					html tbsSubmitButton
 						class: 'btn btn-success btn-lg';
 						callback: [ self givePot ];
-						with: 'Repartir' ] ]
+						with: 'Otorgar' ] ]
 ]
 
 { #category : #rendering }
@@ -115,10 +133,7 @@ GivePotView >> renderPlayer: player chipsTextInputOn: html [
 { #category : #rendering }
 GivePotView >> renderPlayer: player giveAllButonOn: html [
 	| maxPotSize |
-	maxPotSize := self hand partialPots
-		detect: [ :partialPot | partialPot player = player ]
-		ifFound: [ :pot | pot chipsCount ]
-		ifNone: [ self hand potSize ].
+	maxPotSize := self maxPotFor: player.
 	html anchor
 		class: 'btn btn-default btn-sm';
 		onClick: ((html jQuery id: player name asValidSelector) value: maxPotSize);
@@ -131,27 +146,9 @@ GivePotView >> renderPlayer: player nameOn: html [
 ]
 
 { #category : #rendering }
-GivePotView >> renderPlayer: player percentageInputOn: html [
-	html
-		tbsFormGroup: [ html label
-				for: player name asValidSelector;
-				with: player name.
-			html textInput
-				tbsFormControl;
-				id: player name asValidSelector;
-				callback: [ :share | 
-					share ~= '' & share isNotNil
-						ifTrue: [ self shares at: player put: share ] ];
-				placeholder: '% del pozo' ].
-	html
-		paragraph:
-			[ player visibleCards do: [ :card | self renderCard: card on: html ] ]
-]
-
-{ #category : #rendering }
 GivePotView >> renderPlayersOn: html [
 	html
-		tbsRow: [ self hand activePlayers
+		tbsRow: [ self hand activePlayers 
 				do: [ :player | 
 					html
 						tbsColumn: [ self renderPlayer: player chipsInputOn: html ]
@@ -166,4 +163,16 @@ GivePotView >> shares [
 { #category : #accessing }
 GivePotView >> shares: anObject [
 	shares := anObject
+]
+
+{ #category : #accessing }
+GivePotView >> winners [
+	^ winners
+]
+
+{ #category : #accessing }
+GivePotView >> winners: somePlayers [
+	winners := somePlayers.
+	winners
+		do: [ :winner | self chips at: winner put: (self maxPotFor: winner) ]
 ]

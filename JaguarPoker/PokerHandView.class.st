@@ -19,6 +19,12 @@ PokerHandView class >> game: aPokerGame [
 		yourself
 ]
 
+{ #category : #'controlling - hand flow' }
+PokerHandView >> acceptBets [
+	self logSeparator.
+	self hand acceptBets
+]
+
 { #category : #testing }
 PokerHandView >> allIn [
 	^ self hand isAllIn: self currentPlayer
@@ -63,6 +69,24 @@ PokerHandView >> currentPlayer [
 	^ self session player
 ]
 
+{ #category : #'controlling - hand flow' }
+PokerHandView >> deal [
+	self logSeparator.
+	self hand deal
+]
+
+{ #category : #'controlling - hand flow' }
+PokerHandView >> enableCardsChange [
+	self logSeparator.
+	self hand enableCardsChange
+]
+
+{ #category : #'controlling - hand flow' }
+PokerHandView >> enableCardsShowing [
+	self logSeparator.
+	self hand enableCardsShowing
+]
+
 { #category : #controlling }
 PokerHandView >> foldPlayer: aPlayer [
 	self log: aPlayer name, ' se va'.
@@ -81,7 +105,7 @@ PokerHandView >> game: anObject [
 
 { #category : #controlling }
 PokerHandView >> getCashbox [
-	self log: self currentPlayer name, ' sacó una caja.'.
+	self log: self currentPlayer name, ' sacó una cajita.'.
 	^ self currentPlayer getCashbox
 ]
 
@@ -105,6 +129,11 @@ PokerHandView >> isSpeaker [
 	^ self hand speaker = self session player
 ]
 
+{ #category : #testing }
+PokerHandView >> isWinner: aPlayer [
+	^ self winners includes: aPlayer
+]
+
 { #category : #accessing }
 PokerHandView >> log [
 	^ self hand log
@@ -113,6 +142,11 @@ PokerHandView >> log [
 { #category : #accessing }
 PokerHandView >> log: aString [
 	self hand log: aString
+]
+
+{ #category : #'controlling - hand flow' }
+PokerHandView >> logSeparator [
+	self log: '---------------'
 ]
 
 { #category : #controlling }
@@ -258,23 +292,23 @@ PokerHandView >> renderControlsPanelOn: html [
 	self isDealer
 		ifTrue: [ self
 				renderControlButton: 'Repartir'
-					callback: [ self hand deal ]
+					callback: [ self deal ]
 					condition: self hand canDeal
 					on: html;
 				renderControlButton: 'Habilitar Cambio de Cartas'
-					callback: [ self hand enableCardsChange ]
+					callback: [ self enableCardsChange ]
 					condition: self hand canChangeCards
 					on: html;
 				renderControlButton: 'Habilitar Apuesta Final'
-					callback: [ self hand acceptBets ]
+					callback: [ self acceptBets ]
 					condition: self hand canAcceptBets
 					on: html;
 				renderControlButton: 'Habilitar Mostrar Cartas'
-					callback: [ self hand enableCardsShowing ]
+					callback: [ self enableCardsShowing ]
 					condition: self hand canShowCards
 					on: html;
 				renderControlButton: 'Otorgar Pozo'
-					callback: [ self call: (GivePotView hand: self hand) ]
+					callback: [ self call: (GivePotView hand: self hand winners: self winners) ]
 					condition: self hand canSharePot
 					on: html;
 				renderControlButton: 'Administrar Fichas'
@@ -658,4 +692,9 @@ PokerHandView >> visitShowCardsHand: aShowCardsState with: html [
 		with: [ html tbsColumn
 				mediumSize: 4;
 				with: [ self renderShowCardsButtonOn: html ] ]
+]
+
+{ #category : #accessing }
+PokerHandView >> winners [
+	^ self hand winnersInGame: self game
 ]

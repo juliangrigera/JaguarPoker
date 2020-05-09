@@ -20,8 +20,11 @@ NoHand >> beatenBy: aCardsHand [
 { #category : #testing }
 NoHand >> beatsNoHand: aNoHand [
 	| values otherValues |
-	values := self cardValues sorted reversed.
-	otherValues := aNoHand cardValues sorted reversed.
+	aNoHand cards ifEmpty: [ ^ self cards isNotEmpty ].
+	values := self cardValues sorted reversed
+		first: (self cards size min: aNoHand cards size).
+	otherValues := aNoHand cardValues sorted reversed
+		first: (self cards size min: aNoHand cards size).
 	values
 		with: otherValues
 		do: [ :mine :other | 
