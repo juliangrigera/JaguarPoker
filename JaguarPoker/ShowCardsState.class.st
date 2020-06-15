@@ -16,3 +16,8 @@ ShowCardsState >> accept: aHost with: aParameter [
 ShowCardsState >> canSharePot [
 	^ true
 ]
+
+{ #category : #testing }
+ShowCardsState >> showingCards [
+	^ true
+]

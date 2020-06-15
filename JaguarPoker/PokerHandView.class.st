@@ -171,7 +171,7 @@ PokerHandView >> placeAnteFor: aPlayer [
 PokerHandView >> placeFirstBet: aString for: aPlayer [
 	self hand placeFirstBet: aString asNumber for: aPlayer.
 	self bid: 0.
-	self log: aPlayer name , ' pone ' , aString printString 
+	self log: aPlayer name , ' pone ' , aString 
 ]
 
 { #category : #controlling }
@@ -289,6 +289,8 @@ PokerHandView >> renderControlsOn: html [
 
 { #category : #rendering }
 PokerHandView >> renderControlsPanelOn: html [
+	self hand isFresh
+		ifTrue: [ self renderResumeRefreshScriptOn: html ].
 	self isDealer
 		ifTrue: [ self
 				renderControlButton: 'Repartir'
@@ -539,6 +541,11 @@ PokerHandView >> renderRemainingCardsOn: html [
 ]
 
 { #category : #'rendering - visitor' }
+PokerHandView >> renderResumeRefreshScriptOn: html [
+	html script: '$(''#ownPlayerPanelDisabled'').attr(''id'',''ownPlayerPanel'')'
+]
+
+{ #category : #'rendering - visitor' }
 PokerHandView >> renderSecondBetFormOn: html [
 	| chipsToMatch |
 	chipsToMatch := self hand chipsToCallSecondBetFor: self currentPlayer.
@@ -589,7 +596,7 @@ PokerHandView >> renderSpeakerIndicatorFor: aPlayer on: html [
 
 { #category : #'rendering - visitor' }
 PokerHandView >> renderStopRefreshScriptOn: html [
-	html script: '$(''#ownPlayerPanel'').attr(''id'','''')'
+	html script: '$(''#ownPlayerPanel'').attr(''id'',''ownPlayerPanelDisabled'')'
 ]
 
 { #category : #accessing }
@@ -605,10 +612,11 @@ PokerHandView >> selectedCards: someCards [
 { #category : #controlling }
 PokerHandView >> showCards [
 	self currentPlayer showCards: self selectedCards.
-	self
-		log:
-			self currentPlayer name , ' bajó '
-				, (self currentPlayer cardsHandInGame: self game) description.
+	self hand showingCards
+		ifTrue: [ self
+				log:
+					self currentPlayer name , ' bajó '
+						, (self currentPlayer cardsHandInGame: self game) description ].
 	self selectedCards: OrderedCollection new.
 	self hand rotateSpeaker
 ]

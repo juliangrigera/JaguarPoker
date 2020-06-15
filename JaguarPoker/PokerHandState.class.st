@@ -79,6 +79,11 @@ PokerHandState >> hand: aPokerHand [
 	hand := aPokerHand
 ]
 
+{ #category : #testing }
+PokerHandState >> isFresh [
+	^ false
+]
+
 { #category : #'game - bets' }
 PokerHandState >> placeAnteFor: aPlayer [
 	self error: 'No se puede poner luz ahora'
@@ -102,6 +107,11 @@ PokerHandState >> placeSecondBet: anInteger for: aPlayer [
 { #category : #game }
 PokerHandState >> rotateSpeaker [
 	"Do nothing"
+]
+
+{ #category : #testing }
+PokerHandState >> showingCards [
+	^ false
 ]
 
 { #category : #game }

@@ -31,6 +31,11 @@ FreshState >> deal [
 		ifFalse: [ self error: 'Some antes are missing' ]
 ]
 
+{ #category : #testing }
+FreshState >> isFresh [
+	^ true
+]
+
 { #category : #'game - bids' }
 FreshState >> placeAnteFor: aPlayer [
 	hand addBet: (aPlayer getAnte)

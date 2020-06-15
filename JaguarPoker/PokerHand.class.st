@@ -325,6 +325,11 @@ PokerHand >> isAllIn: aPlayer [
 	^ self allInPlayers includes: aPlayer
 ]
 
+{ #category : #testing }
+PokerHand >> isFresh [
+	^ self state isFresh
+]
+
 { #category : #accessing }
 PokerHand >> lastRaiser [
 	^ lastRaiser
@@ -479,6 +484,11 @@ PokerHand >> secondBetsRoundDone [
 				|
 					(self activePlayers
 						allSatisfy: [ :player | (self isAllIn: player) | (self placedSecondBet: player) ]))
+]
+
+{ #category : #testing }
+PokerHand >> showingCards [
+	^ self state showingCards
 ]
 
 { #category : #game }
